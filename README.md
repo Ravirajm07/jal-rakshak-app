@@ -2,7 +2,7 @@
 
 **JalRakshak** is a Next-Generation Smart Water Health & Flood Monitoring System designed for real-time tracking of water quality, flood risks, and citizen complaints. It seamlessly connects citizens with administrators through a responsive web and mobile application.
 
-![JalRakshak Banner](https://via.placeholder.com/1200x400/1e40af/ffffff?text=JalRakshak+Dashboard)
+![JalRakshak Banner](public/assets/dashboard.png)
 
 ## 🚀 Key Features
 
@@ -71,11 +71,11 @@ graph TD
 
 | Dashboard | Live Map |
 |-----------|----------|
-| ![Dashboard](https://via.placeholder.com/600x350/e2e8f0/1e293b?text=Dashboard+View) | ![Map](https://via.placeholder.com/600x350/e2e8f0/1e293b?text=Interactive+Map) |
+| ![Dashboard](public/assets/dashboard.png) | ![Map](public/assets/map.png) |
 
 | Camera Surveillance | Complaint Management |
 |---------------------|----------------------|
-| ![Cameras](https://via.placeholder.com/600x350/e2e8f0/1e293b?text=Live+CCTV+Grid) | ![Admin](https://via.placeholder.com/600x350/e2e8f0/1e293b?text=Admin+Tools) |
+| ![Cameras](public/assets/cameras.png) | ![Admin](public/assets/admin.png) |
 
 ---
 
