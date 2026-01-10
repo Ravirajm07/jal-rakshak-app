@@ -1,0 +1,69 @@
+.mapContainer {
+    height: calc(100vh - 120px);
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+}
+
+.mapWrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.markerCluster {
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+}
+
+/* Fix Leaflet Popup Styles */
+:global(.leaflet-popup-content-wrapper) {
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: 0 !important;
+    overflow: hidden;
+    background: white;
+}
+
+:global(.leaflet-popup-content) {
+    margin: 0 !important;
+    width: 280px !important;
+    font-family: var(--font-sans) !important;
+    /* Force Inter font */
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+:global(.leaflet-popup-tip) {
+    background: white;
+}
+
+:global(.leaflet-container) {
+    font-family: var(--font-sans) !important;
+}
+
+:global(.custom-icon) {
+    background: transparent;
+    border: none;
+}
+
+/* Close button style fix */
+:global(.leaflet-popup-close-button) {
+    top: 8px !important;
+    right: 8px !important;
+    color: var(--text-tertiary) !important;
+    font-size: 18px !important;
+    width: 24px !important;
+    height: 24px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+:global(.leaflet-popup-close-button:hover) {
+    background-color: var(--background);
+    color: var(--text-primary) !important;
+}

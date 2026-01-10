@@ -1,0 +1,125 @@
+.container {
+    max-width: 800px;
+    /* max-w-2xl equivalent + a bit more */
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alertList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.alertCard {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.alertCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Severity-based Borders */
+.alertCard.danger {
+    border-left: 4px solid #ef4444;
+}
+
+.alertCard.warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.alertCard.safe {
+    border-left: 4px solid #22c55e;
+}
+
+.iconWrapper {
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.content {
+    flex: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.25rem;
+}
+
+.headline {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.badge.danger {
+    background-color: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+}
+
+.badge.warning {
+    background-color: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fef3c7;
+}
+
+.badge.safe {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #dcfce7;
+}
+
+.message {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+.timestamp {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: #64748b;
+    background: #f8fafc;
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--border);
+}

@@ -1,0 +1,41 @@
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    z-index: 50;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    width: 100%;
+    max-width: 4.5rem;
+}
+
+.item:hover {
+    background-color: var(--background);
+}
+
+.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+@media (min-width: 768px) {
+    .nav {
+        display: none;
+    }
+}

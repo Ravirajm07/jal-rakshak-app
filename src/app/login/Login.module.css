@@ -1,0 +1,108 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    padding: 1rem;
+}
+
+.loginCard {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.logoIcon {
+    width: 3rem;
+    height: 3rem;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoText h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.logoText p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: var(--border);
+    margin-bottom: 2rem;
+}
+
+.welcomeText {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.welcomeText h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.welcomeText p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.toggleContainer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.toggleButton {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 0.5rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: inherit;
+}
+
+.toggleButton:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+.footerNote {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: center;
+    margin-top: 1.5rem;
+    line-height: 1.4;
+    max-width: 90%;
+}

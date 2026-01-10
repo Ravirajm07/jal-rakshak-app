@@ -1,0 +1,72 @@
+.box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.box:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.warning {
+    background-color: #fffbeb;
+    /* amber-50 */
+    border-color: #fcd34d;
+    color: #92400e;
+}
+
+.danger {
+    background-color: #fef2f2;
+    /* red-50 */
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+.safe {
+    background-color: #ecfdf5;
+    /* emerald-50 */
+    border-color: #6ee7b7;
+    color: #065f46;
+}
+
+.iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    flex-shrink: 0;
+}
+
+.content {
+    flex: 1;
+}
+
+.title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+}
+
+.message {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.arrow {
+    opacity: 0.5;
+}
