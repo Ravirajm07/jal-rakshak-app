@@ -120,4 +120,15 @@ npx cap open android
 | **Admin** | `admin@jalrakshak.com` | `admin123` |
 | **Citizen** | `user@example.com` | `user123` |
 
+---
+
+## 🌐 Deployment (GitHub Pages)
+This repository is configured to automatically deploy to **GitHub Pages**.
+
+### How to Enable:
+1. Go to your GitHub Repository.
+2. Click **Settings** > **Pages** (in the sidebar).
+3. Under **Build and deployment** > **Source**, select **GitHub Actions**.
+4. The site will automatically build and deploy on your next push!
+
 2026 © JalRakshak Team | Built for safe and smart cities.
