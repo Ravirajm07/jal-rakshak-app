@@ -27,65 +27,81 @@ export default function SettingsPage() {
             <h1 className="text-2xl font-bold">Settings</h1>
 
             {/* AI Configuration */}
-            <Card className="p-4">
-                <div className="flex items-center gap-3 mb-4 text-slate-800">
-                    <Key size={20} className="text-blue-600" />
+            <Card className="p-6">
+                <div className="flex items-start gap-4 mb-6">
+                    <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+                        <Key size={24} />
+                    </div>
                     <div>
-                        <CardTitle>Google Gemini AI Configuration</CardTitle>
-                        <CardDescription>Enter your API key to enable smart features.</CardDescription>
+                        <CardTitle className="text-lg">Google Gemini AI Configuration</CardTitle>
+                        <CardDescription className="mt-1">Enter your API key to enable smart features like AI Chat and predictive analytics.</CardDescription>
                     </div>
                 </div>
-                <div className="flex gap-2">
+
+                <div className="flex gap-3">
                     <div className="flex-1">
                         <Input
                             type="password"
-                            placeholder="Enter Gemini API Key"
+                            placeholder="Enter your Gemini API Key here..."
                             value={apiKey}
                             onChange={(e) => setApiKey(e.target.value)}
+                            className="h-10"
                         />
                     </div>
-                    <Button onClick={handleSaveKey}>Save Key</Button>
+                    <Button onClick={handleSaveKey} className="h-10 px-6">Save Key</Button>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">
-                    Leave empty to use "Simulation Mode" for demonstration purposes.
-                </p>
+
+                <div className="mt-4 flex items-center gap-2 p-3 bg-slate-50 rounded-lg text-xs text-slate-500 border border-slate-100">
+                    <span className="font-semibold text-blue-600">Note:</span>
+                    Leave empty to use "Simulation Mode" for demonstration.
+                </div>
             </Card>
 
-            <Card className="divide-y">
-                <div className="p-4 flex items-center justify-between">
+            {/* Settings List */}
+            <Card className="divide-y divide-slate-100 overflow-hidden" style={{ padding: 0 }}>
+                {/* Notifications */}
+                <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                     <div className="flex items-center gap-3">
-                        <Bell className="text-slate-500" size={20} />
+                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                            <Bell size={20} />
+                        </div>
                         <div>
-                            <p className="font-medium">Notifications</p>
-                            <p className="text-xs text-slate-500">Receive flood alerts</p>
+                            <p className="font-medium text-slate-900">Notifications</p>
+                            <p className="text-sm text-slate-500">Receive flood alerts</p>
                         </div>
                     </div>
-                    <div className="w-10 h-6 bg-blue-600 rounded-full relative cursor-pointer">
-                        <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600">
+                        <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
                     </div>
                 </div>
 
-                <div className="p-4 flex items-center justify-between">
+                {/* Language */}
+                <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                     <div className="flex items-center gap-3">
-                        <Globe className="text-slate-500" size={20} />
+                        <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                            <Globe size={20} />
+                        </div>
                         <div>
-                            <p className="font-medium">Language</p>
-                            <p className="text-xs text-slate-500">English (Default)</p>
+                            <p className="font-medium text-slate-900">Language</p>
+                            <p className="text-sm text-slate-500">English (Default)</p>
                         </div>
                     </div>
-                    <span className="text-sm text-slate-400 cursor-not-allowed">Change</span>
+                    <span className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">Change</span>
                 </div>
 
-                <div className="p-4 flex items-center justify-between">
+                {/* Dark Mode */}
+                <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                     <div className="flex items-center gap-3">
-                        <Moon className="text-slate-500" size={20} />
+                        <div className="p-2 bg-slate-100 text-slate-600 rounded-lg">
+                            <Moon size={20} />
+                        </div>
                         <div>
-                            <p className="font-medium">Dark Mode</p>
-                            <p className="text-xs text-slate-500">Coming soon</p>
+                            <p className="font-medium text-slate-900">Dark Mode</p>
+                            <p className="text-sm text-slate-500">Coming soon</p>
                         </div>
                     </div>
-                    <div className="w-10 h-6 bg-slate-200 rounded-full relative cursor-not-allowed">
-                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200">
+                        <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition" />
                     </div>
                 </div>
             </Card>
