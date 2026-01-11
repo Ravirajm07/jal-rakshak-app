@@ -7,9 +7,19 @@ import {
     signOut,
     User
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase"; // Import db here
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/ui/Toast";
+import {
+    collection,
+    addDoc,
+    updateDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+} from "firebase/firestore";
 
 // Define Types
 type UserRole = "citizen" | "admin" | null;
@@ -98,8 +108,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, []);
 
     // Firestore Collections
-    const { db } = require("@/lib/firebase");
-    const { collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp } = require("firebase/firestore");
+    // Firestore Collections - Imports moved to top
 
     // Toast State
     const [toasts, setToasts] = useState<any[]>([]);
