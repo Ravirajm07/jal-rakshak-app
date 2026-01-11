@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { ToastContainer } from "@/components/ui/Toast";
 
 // Define Types
 type UserRole = "citizen" | "admin" | null;
@@ -27,12 +28,14 @@ interface Alert {
 }
 
 interface Complaint {
-    id: number;
+    id: string; // Changed from number to string for Firestore ID
     type: "Pipe Burst" | "Water Logging" | "Sewage Leak" | "Quality Issue" | "Other";
     location: string;
     status: "Open" | "In Progress" | "Resolved";
     description?: string;
     adminResponse?: string;
+    timestamp?: any; // Firestore Timestamp
+    userId?: string;
 }
 
 interface DataContextType {
@@ -43,8 +46,8 @@ interface DataContextType {
     complaints: Complaint[];
     login: (role: UserRole) => Promise<void>; // Kept for interface compatibility, but unused
     logout: () => Promise<void>;
-    addComplaint: (complaint: Omit<Complaint, "id" | "status">) => void;
-    updateComplaintStatus: (id: number, status: Complaint["status"], adminResponse?: string) => void;
+    addComplaint: (complaint: Omit<Complaint, "id" | "status" | "timestamp">) => Promise<void>;
+    updateComplaintStatus: (id: string, status: Complaint["status"], adminResponse?: string) => Promise<void>;
     loading: boolean;
 }
 
@@ -62,10 +65,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         { id: 1, message: "Flood Warning: Panchganga River level rising above 45ft.", severity: "danger", timestamp: "10 mins ago" },
         { id: 2, message: "Safe drinking water supply restored in Ward C.", severity: "safe", timestamp: "2 hours ago" },
     ]);
-    const [complaints, setComplaints] = useState<Complaint[]>([
-        { id: 101, type: "Pipe Burst", location: "Rankala Road", status: "Open", description: "Heavy leakage near bus stop" },
-        { id: 102, type: "Water Logging", location: "Shahupuri", status: "In Progress", description: "Drainage blocked" },
-    ]);
+    const [complaints, setComplaints] = useState<Complaint[]>([]);
 
     // Firebase Auth Listener
     useEffect(() => {
@@ -97,10 +97,64 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return () => clearInterval(interval);
     }, []);
 
+    // Firestore Collections
+    const { db } = require("@/lib/firebase");
+    const { collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp } = require("firebase/firestore");
+
+    // Toast State
+    const [toasts, setToasts] = useState<any[]>([]);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+    const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+        const id = Math.random().toString(36).substr(2, 9);
+        setToasts(prev => [...prev, { id, message, type }]);
+    };
+
+    const removeToast = (id: string) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    };
+
+    // Real-time Complaints Listener with Notifications
+    useEffect(() => {
+        const q = query(collection(db, "complaints"), orderBy("timestamp", "desc"));
+        const unsubscribe = onSnapshot(q, (snapshot: any) => {
+            const fetchedComplaints = snapshot.docs.map((doc: any) => ({
+                id: doc.id,
+                ...doc.data()
+            })) as Complaint[];
+
+            setComplaints(fetchedComplaints);
+
+            // Handle Notifications
+            if (!isFirstLoad) {
+                snapshot.docChanges().forEach((change: any) => {
+                    const docData = change.doc.data();
+                    // New Complaint (Notify Admin)
+                    if (change.type === "added" && userRole === "admin" && docData.userId !== user?.uid) {
+                        showToast(`New ${docData.type} reported at ${docData.location}`, "info");
+                    }
+                    // Status Update (Notify Citizen)
+                    if (change.type === "modified") {
+                        // If user is owner
+                        if (userRole === "citizen" && docData.userId === user?.uid) {
+                            showToast(`Your complaint status updated to: ${docData.status}`, "success");
+                        }
+                        // If admin just updated it
+                        if (userRole === "admin") {
+                            // Optional confirmation for admin
+                        }
+                    }
+                });
+            } else {
+                setIsFirstLoad(false);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [userRole, user, isFirstLoad]); // Dependencies updated
 
     // Actions
     const login = async (role: UserRole) => {
-        // Deprecated in favor of direct Firebase login in page component
         console.warn("Use signInWithEmailAndPassword directly");
     };
 
@@ -113,17 +167,35 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const addComplaint = (complaint: Omit<Complaint, "id" | "status">) => {
-        const newComplaint: Complaint = {
-            id: Math.floor(Math.random() * 1000) + 1000,
-            status: "Open",
-            ...complaint
-        };
-        setComplaints(prev => [newComplaint, ...prev]);
+    const addComplaint = async (complaint: Omit<Complaint, "id" | "status" | "timestamp">) => {
+        try {
+            await addDoc(collection(db, "complaints"), {
+                ...complaint,
+                status: "Open",
+                timestamp: serverTimestamp(), // Server-side timestamp
+                userId: user?.uid || "anonymous",
+                userEmail: user?.email || "anonymous"
+            });
+            showToast("Complaint submitted successfully!", "success");
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            showToast("Failed to submit complaint.", "error");
+        }
     };
 
-    const updateComplaintStatus = (id: number, status: Complaint["status"], adminResponse?: string) => {
-        setComplaints(prev => prev.map(c => c.id === id ? { ...c, status, adminResponse } : c));
+    const updateComplaintStatus = async (id: string, status: Complaint["status"], adminResponse?: string) => {
+        try {
+            const compRef = doc(db, "complaints", id);
+            await updateDoc(compRef, {
+                status,
+                adminResponse,
+                lastUpdated: serverTimestamp()
+            });
+            showToast("Status updated!", "success");
+        } catch (e) {
+            console.error("Error updating status: ", e);
+            showToast("Failed to update status.", "error");
+        }
     };
 
     return (
@@ -140,6 +212,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             loading
         }}>
             {children}
+            <ToastContainer toasts={toasts} removeToast={removeToast} />
         </DataContext.Provider>
     );
 }

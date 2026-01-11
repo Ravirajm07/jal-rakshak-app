@@ -14,8 +14,11 @@ const firebaseConfig = {
     measurementId: "G-K1QFT8MM67"
 };
 
+import { getFirestore } from "firebase/firestore";
+
 // Initialize Firebase (Singleton pattern)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-export { auth };
+export { auth, db };
