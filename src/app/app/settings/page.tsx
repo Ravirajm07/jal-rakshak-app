@@ -60,48 +60,48 @@ export default function SettingsPage() {
             {/* Settings List */}
             <Card className="divide-y divide-slate-100 overflow-hidden" style={{ padding: 0 }}>
                 {/* Notifications */}
-                <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                            <Bell size={20} />
+                <div className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+                    <div className="flex items-center">
+                        <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <Bell size={24} />
                         </div>
-                        <div>
-                            <p className="font-medium text-slate-900">Notifications</p>
-                            <p className="text-sm text-slate-500">Receive flood alerts</p>
+                        <div className="ml-4 flex flex-col">
+                            <p className="font-semibold text-base text-slate-900 leading-tight">Notifications</p>
+                            <p className="text-sm text-slate-500 mt-1">Receive flood alerts</p>
                         </div>
                     </div>
-                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600">
-                        <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
+                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 cursor-pointer">
+                        <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition shadow-sm" />
                     </div>
                 </div>
 
                 {/* Language */}
-                <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
-                            <Globe size={20} />
+                <div className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+                    <div className="flex items-center">
+                        <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                            <Globe size={24} />
                         </div>
-                        <div>
-                            <p className="font-medium text-slate-900">Language</p>
-                            <p className="text-sm text-slate-500">English (Default)</p>
+                        <div className="ml-4 flex flex-col">
+                            <p className="font-semibold text-base text-slate-900 leading-tight">Language</p>
+                            <p className="text-sm text-slate-500 mt-1">English (Default)</p>
                         </div>
                     </div>
-                    <span className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">Change</span>
+                    <span className="text-sm font-medium text-blue-600 cursor-pointer hover:underline px-2 py-1 rounded">Change</span>
                 </div>
 
                 {/* Dark Mode */}
-                <div className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-slate-100 text-slate-600 rounded-lg">
-                            <Moon size={20} />
+                <div className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center">
+                        <div className="p-3 bg-slate-100 text-slate-600 rounded-xl">
+                            <Moon size={24} />
                         </div>
-                        <div>
-                            <p className="font-medium text-slate-900">Dark Mode</p>
-                            <p className="text-sm text-slate-500">Coming soon</p>
+                        <div className="ml-4 flex flex-col">
+                            <p className="font-semibold text-base text-slate-900 leading-tight">Dark Mode</p>
+                            <p className="text-sm text-slate-500 mt-1">Coming soon</p>
                         </div>
                     </div>
-                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200">
-                        <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition" />
+                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 cursor-not-allowed">
+                        <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition shadow-sm" />
                     </div>
                 </div>
             </Card>
