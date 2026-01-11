@@ -1,0 +1,205 @@
+.pageContainer {
+    max-width: 42rem;
+    /* max-w-2xl */
+    margin: 0 auto;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* space-y-6 */
+}
+
+.pageTitle {
+    font-size: 1.5rem;
+    /* text-2xl */
+    font-weight: 700;
+    /* font-bold */
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+/* AI Config Card */
+.aiHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.iconBox {
+    padding: 0.75rem;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.cardDesc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.inputGroup {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.inputWrapper {
+    flex: 1;
+}
+
+.noteBox {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.noteLabel {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Settings List */
+.listContainer {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.listItem {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: between;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.listItem:last-child {
+    border-bottom: none;
+}
+
+.listItem:hover {
+    background-color: var(--background);
+}
+
+.itemLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.itemIcon {
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon Colors */
+.iconBlue {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.iconPurple {
+    background-color: #f3e8ff;
+    /* purple-50 */
+    color: #9333ea;
+    /* purple-600 */
+}
+
+.iconSlate {
+    background-color: #f1f5f9;
+    /* slate-100 */
+    color: #475569;
+    /* slate-600 */
+}
+
+.itemContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.itemTitle {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.itemSubtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* Toggles & Actions */
+.toggle {
+    width: 2.75rem;
+    height: 1.5rem;
+    background-color: var(--border);
+    border-radius: 9999px;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.toggleActive {
+    background-color: var(--primary);
+}
+
+.toggleDot {
+    width: 1rem;
+    height: 1rem;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    transition: transform 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.toggleActive .toggleDot {
+    transform: translateX(1.25rem);
+}
+
+.changeLink {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.changeLink:hover {
+    background-color: var(--primary-light);
+}
+
+.itemRight {
+    margin-left: auto;
+    /* push to right */
+    display: flex;
+    align-items: center;
+}
