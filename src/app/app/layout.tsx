@@ -8,6 +8,7 @@ import { SideDrawer } from "@/components/layout/SideDrawer";
 import styles from "@/components/layout/MainLayout.module.css";
 import { Bell, User, CloudRain } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { DisclaimerModal } from "@/components/common/DisclaimerModal";
 
 export default function AppLayout({
     children,
@@ -62,6 +63,7 @@ export default function AppLayout({
             </div>
 
             <BottomNav />
+            <DisclaimerModal />
         </div>
     );
 }
