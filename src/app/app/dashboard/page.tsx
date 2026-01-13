@@ -131,7 +131,7 @@ export default function Dashboard() {
                             <span className={styles.metricLabel}>Current Level</span>
                         </div>
 
-                        <div className={styles.chartContainer}>
+                        <div className={styles.chartContainer} style={{ height: 300, width: "100%" }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={LEVEL_DATA}>
                                     <defs>

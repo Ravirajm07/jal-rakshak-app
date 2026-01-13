@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "JalRakshak - Smart Water Monitoring",
   description: "Citizen & Admin Portal for Water Health, Flood Alerts & Sanitation",
-  manifest: "/manifest.json",
+  manifest: "/jal-rakshak-app/manifest.json",
 };
 
 export const viewport = {
