@@ -24,9 +24,48 @@ export default function SettingsPage() {
         alert("API Key Saved Successfully!");
     };
 
+    const { addComplaint } = useData();
+    const [isSeeding, setIsSeeding] = useState(false);
+
+    const handleSeed = async () => {
+        setIsSeeding(true);
+        try {
+            await addComplaint({
+                type: "Water Logging",
+                location: "Panchganga Ghat",
+                description: "Severe water logging observed due to heavy rain."
+            });
+            await addComplaint({
+                type: "Pipe Burst",
+                location: "Rankala Lake Road",
+                description: "Main water supply line leakage reported."
+            });
+            await addComplaint({
+                type: "Quality Issue",
+                location: "Shivaji Park",
+                description: "Water appears muddy and has a bad odor."
+            });
+            alert("✅ 3 Sample Complaints Added!");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to add data. Check console.");
+        }
+        setIsSeeding(false);
+    };
+
     return (
         <div className={styles.pageContainer}>
-            <h1 className={styles.pageTitle}>Settings</h1>
+            <div className="flex justify-between items-center">
+                <h1 className={styles.pageTitle}>Settings</h1>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSeed}
+                    disabled={isSeeding}
+                >
+                    {isSeeding ? "Seeding..." : "🌱 Seed Database"}
+                </Button>
+            </div>
 
             {/* AI Configuration */}
             <Card className={styles.aiCard}>
