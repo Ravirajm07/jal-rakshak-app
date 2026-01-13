@@ -39,6 +39,29 @@
 | **AI** | [Google Gemini API](https://ai.google.dev/) |
 | **Mobile** | [Capacitor](https://capacitorjs.com/) (Android) |
 
+
+---
+
+## 🗄️ Database & Cloud Infrastructure
+
+**Primary Database: Google Firebase Firestore** (NoSQL)
+
+The application uses **Cloud Firestore** as its central backbone for real-time data management. This serverless, scalable NoSQL database ensures that all users (Citizens and Admins) see the exact same data instantly.
+
+### Why Firestore?
+- **Real-time Listeners**: The Dashboard and Alert systems use `onSnapshot` listeners. When an Admin updates a complaint status, the Citizen's screen updates explicitly within milliseconds—no refresh needed.
+- **Scalability**: Capable of handling massive geolocation queries effectively.
+- **Offline Support**: Critical for the Android mobile app, allowing field workers to view data even in low-connectivity zones.
+
+### Data collections:
+- **`users`**: Secure profile storage with Role-Based Access Control (RBAC).
+- **`complaints`**: Citizen reports containing:
+    - Geo-coordinates (Lat/Lng)
+    - Timestamp (Server time)
+    - Image URLs
+    - Status tracking (Pending -> In Progress -> Resolved)
+- **`alerts`**: High-priority flood warnings broadcasted to all active devices.
+
 ---
 
 ## 🏗️ Architecture Flow
