@@ -1,0 +1,165 @@
+/* DecisionPanel.module.css */
+.panel {
+    background-color: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border-left: 6px solid;
+    transition: all 0.3s ease;
+}
+
+.panel.critical {
+    border-color: var(--danger);
+    background-color: #fef2f2;
+}
+
+.panel.warning {
+    border-color: var(--warning);
+    background-color: #fffbeb;
+}
+
+.panel.normal {
+    border-color: var(--success);
+    background-color: #ecfdf5;
+}
+
+.header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.titleSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.icon {
+    font-size: 1.5rem;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+}
+
+.content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .content {
+        flex-direction: row;
+    }
+}
+
+.statusBox {
+    flex: 1;
+}
+
+.statusLabel {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.statusMessage {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.critical .statusMessage {
+    color: var(--danger);
+}
+
+.warning .statusMessage {
+    color: var(--warning);
+}
+
+.normal .statusMessage {
+    color: var(--success);
+}
+
+.actionBox {
+    flex: 2;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.actionTitle {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.actionList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.actionItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.actionItem:last-child {
+    margin-bottom: 0;
+}
+
+.bullet {
+    margin-top: 0.4rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--text-tertiary);
+}
+
+.critical .bullet {
+    background-color: var(--danger);
+}
+
+.warning .bullet {
+    background-color: var(--warning);
+}
+
+.normal .bullet {
+    background-color: var(--success);
+}
+
+.actions {
+    padding: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.02);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
