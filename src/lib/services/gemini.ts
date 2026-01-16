@@ -2,7 +2,7 @@ export class GeminiService {
     private static apiKey: string | null = null;
     private static readonly STORAGE_KEY = 'jalrakshak_gemini_key';
     // Hardcoded for internal usage as requested
-    private static readonly DEFAULT_API_KEY = "AIzaSyARPQjSFMoVn2S6ENtiwacA82W66tZAjSI";
+    private static readonly DEFAULT_API_KEY = "AIzaSyDe--ZiX2sMEUzz40TAWHHoN5STaT96zok";
 
     static initialize() {
         if (typeof window !== 'undefined') {
