@@ -42,7 +42,7 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     },
     {
         label: "Complaints",
-        href: "/app/report",
+        href: "/app/complaints",
         icon: FileWarning,
         roles: ["admin", "citizen"]
     },
