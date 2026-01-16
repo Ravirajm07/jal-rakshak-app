@@ -126,11 +126,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setToasts(prev => prev.filter(t => t.id !== id));
     };
 
+    const [isApiFallback, setIsApiFallback] = useState(false);
+
     // Fetch Complaints (with Demo Fallback)
     const fetchComplaints = async () => {
+        // Stop hammering if we already know API is down
+        if (isApiFallback) return;
+
         try {
             const res = await fetch('/api/complaints');
+            if (res.status === 503) throw new Error("Service Unavailable");
             if (!res.ok) throw new Error("API Failed");
+
             const data = await res.json();
             if (data.success) {
                 const mappedComplaints = data.data.map((c: any) => ({
@@ -142,7 +149,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 setComplaints(mappedComplaints);
             }
         } catch (error) {
-            console.warn("API unavailable, using demo data:", error);
+            console.warn("API unavailable, switching to persistent demo mode:", error);
+            setIsApiFallback(true); // LOCK: Stop further network requests
             if (complaints.length === 0) setComplaints(DEMO_COMPLAINTS);
         }
     };
@@ -150,9 +158,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     // Initial fetch and polling
     useEffect(() => {
         fetchComplaints();
-        const interval = setInterval(fetchComplaints, 5000); // Live sync
+        const interval = setInterval(() => {
+            if (!isApiFallback) fetchComplaints();
+        }, 5000); // Live sync
         return () => clearInterval(interval);
-    }, []);
+    }, [isApiFallback]);
 
     // Actions
     const login = async (role: UserRole) => {
