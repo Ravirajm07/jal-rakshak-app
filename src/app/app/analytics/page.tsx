@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import {
     LineChart,
@@ -17,7 +17,83 @@ import styles from "./Analytics.module.css";
 import { Badge } from "@/components/ui/Badge";
 import { Tabs } from "@/components/ui/Tabs";
 
-// --- Data Constants ---
+// --- Advanced Logic Engines ---
+
+type TrendType = 'Rising' | 'Falling' | 'Stable' | 'Volatile';
+type RiskLevel = 'Critical' | 'High' | 'Moderate' | 'Low';
+type TimeRange = 'day' | 'week' | 'year';
+
+function analyzeTrend(values: number[]): TrendType {
+    if (values.length < 2) return 'Stable';
+
+    // Volatility check: High variance relative to range
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const end = values[values.length - 1];
+    const start = values[0];
+
+    const range = max - min;
+    // If range is significant (>2) and end point is far from extremes or erratic
+    if (range > 3 && (Math.abs(end - start) < range * 0.2)) return 'Volatile';
+
+    const change = ((end - start) / start) * 100;
+
+    if (change > 5) return 'Rising';
+    if (change < -5) return 'Falling';
+    return 'Stable';
+}
+
+function calculateVelocity(values: number[]): number {
+    // Max hourly rise
+    let maxRise = 0;
+    for (let i = 1; i < values.length; i++) {
+        const delta = values[i] - values[i - 1];
+        if (delta > maxRise) maxRise = delta;
+    }
+    return parseFloat(maxRise.toFixed(2));
+}
+
+function generateInsight(range: TimeRange, levelData: any[], qualityData: any[]): string {
+    const levels = levelData.map(d => d.level);
+    const turbidities = qualityData.map(d => d.turbidity);
+
+    const trend = analyzeTrend(levels);
+    const currentLevel = levels[levels.length - 1];
+    const maxLevel = Math.max(...levels);
+
+    // Safety thresholds
+    const DANGER_LEVEL = 16.0;
+    const WARNING_LEVEL = 14.5;
+
+    let risk: RiskLevel = 'Low';
+    if (maxLevel >= DANGER_LEVEL) risk = 'Critical';
+    else if (maxLevel >= WARNING_LEVEL) risk = 'High';
+    else if (trend === 'Rising') risk = 'Moderate';
+
+    // Dynamic Text Generation Pattern
+    switch (range) {
+        case 'day':
+            const velocity = calculateVelocity(levels);
+            const urgentPhrase = velocity > 0.5 ? `Rapid rise detected (${velocity}m/hr).` : "Velocity is stable.";
+
+            return `Immediate Analysis: Water levels are ${trend} at ${currentLevel}m. ${urgentPhrase} Immediate risk is ${risk.toUpperCase()}. ${risk === 'Critical' ? "EVACUATION ADVISED." : "Monitor hourly updates for sudden spikes."
+                }`;
+
+        case 'week':
+            const avgTurbidity = (turbidities.reduce((a, b) => a + b, 0) / turbidities.length).toFixed(1);
+            return `Operational Status: 7-day trend is ${trend}. Highest recorded level was ${maxLevel}m. ${trend === 'Rising' ? "Mobilize response teams for potential overflow." : "Conditions are stabilizing within operational norms."
+                } Turbidity average is ${avgTurbidity} NTU.`;
+
+        case 'year':
+            // Simple seasonality check simulation
+            const monsoonPeak = levelData.find(d => ['Jul', 'Aug'].includes(d.month))?.level || 0;
+            const isAbnormal = monsoonPeak > 18; // Historic norm
+
+            return `Strategic Insight: Annual cycle indicates ${isAbnormal ? 'heavy' : 'normal'} monsoon seasonality. Peak observed in August (${monsoonPeak}m). Infrastructure load capacity was ${isAbnormal ? 'EXCEEDED' : 'sufficient'}. Long-term recommendation: ${isAbnormal ? 'Upgrade flood defenses in Sector 4.' : 'Maintain current maintenance schedule.'}`;
+    }
+}
+
+// --- Data Constants (Raw Data Only) ---
 
 const DATA_SETS = {
     day: {
@@ -33,13 +109,12 @@ const DATA_SETS = {
         quality: [
             { time: "00:00", ph: 7.1, turbidity: 2 },
             { time: "04:00", ph: 7.0, turbidity: 2.5 },
-            { time: "08:00", ph: 6.5, turbidity: 8 }, // Rain impact
+            { time: "08:00", ph: 6.5, turbidity: 8 },
             { time: "12:00", ph: 6.8, turbidity: 6 },
             { time: "16:00", ph: 7.0, turbidity: 4 },
             { time: "20:00", ph: 7.2, turbidity: 3 },
             { time: "23:59", ph: 7.1, turbidity: 2 },
-        ],
-        analysis: "Immediate Analysis: Sudden water level spike observed at 08:00 due to heavy morning rainfall. Turbidity increased significantly but is currently stabilizing. Proceed with caution."
+        ]
     },
     week: {
         level: [
@@ -59,8 +134,7 @@ const DATA_SETS = {
             { day: "Fri", ph: 7.1, turbidity: 4 },
             { day: "Sat", ph: 7.3, turbidity: 2 },
             { day: "Sun", ph: 7.2, turbidity: 2.5 },
-        ],
-        analysis: "Weekly Trend: Water levels peaked on Thursday (15.5m), approaching the danger mark. Quality metrics show a correlation between level rise and turbidity spikes. Ensure drainage checks."
+        ]
     },
     year: {
         level: [
@@ -77,23 +151,26 @@ const DATA_SETS = {
             { month: "Jan", ph: 7.4, turbidity: 1 },
             { month: "Mar", ph: 7.2, turbidity: 2 },
             { month: "May", ph: 7.0, turbidity: 3 },
-            { month: "Jul", ph: 6.5, turbidity: 15 }, // Muddy
+            { month: "Jul", ph: 6.5, turbidity: 15 },
             { month: "Aug", ph: 6.4, turbidity: 18 },
             { month: "Sep", ph: 6.8, turbidity: 10 },
             { month: "Oct", ph: 7.0, turbidity: 5 },
             { month: "Dec", ph: 7.3, turbidity: 1.5 },
-        ],
-        analysis: "Annual Pattern: Consistent monsoon spikes (July-August) observed repeatedly. Long-term data suggests identifying flood plains for evacuation during Q3. Water quality is excellent in Q1 and Q4."
+        ]
     }
 };
-
-type TimeRange = 'day' | 'week' | 'year';
 
 export default function AnalyticsPage() {
     const [timeRange, setTimeRange] = useState<TimeRange>('week');
 
     const currentData = DATA_SETS[timeRange];
+    // Cast strict keys for Recharts to avoid type complaint, though it usually handles it.
     const xAxisKey = timeRange === 'day' ? 'time' : timeRange === 'year' ? 'month' : 'day';
+
+    // Dynamic generation via memoization
+    const systemAnalysisText = useMemo(() => {
+        return generateInsight(timeRange, currentData.level, currentData.quality);
+    }, [timeRange, currentData]);
 
     return (
         <div className={styles.container}>
@@ -195,7 +272,7 @@ export default function AnalyticsPage() {
             <Card className="bg-blue-50 border-blue-100 mt-6 md:mt-4">
                 <CardTitle className="text-blue-900">System Analysis</CardTitle>
                 <p className="text-sm text-blue-800 mt-2 leading-relaxed">
-                    <strong>({timeRange.toUpperCase()} VIEW):</strong> {currentData.analysis}
+                    <strong>({timeRange.toUpperCase()} VIEW):</strong> {systemAnalysisText}
                 </p>
             </Card>
         </div>
