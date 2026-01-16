@@ -25,34 +25,34 @@ export default function ComplaintsPage() {
     return (
         <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
             {/* Header */}
-            <header className="flex justify-between items-end">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Complaint Management</h1>
-                    <p className="text-sm text-gray-500 mt-1">Wait Last updated: Just now</p>
+                    <p className="text-sm text-gray-500 mt-1">Real-time complaint tracking and status updates</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2 px-4 py-2 rounded-lg transition-colors">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm flex items-center gap-2 px-4 py-2 rounded-lg transition-all w-fit">
                     <Download size={18} />
                     Export Data
                 </Button>
             </header>
 
             {/* Filters Bar */}
-            <Card className="p-4 border border-gray-100 shadow-sm rounded-xl bg-white">
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                    {/* Search - Left Aligned */}
-                    <div className="relative w-full md:max-w-xl">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Card className="p-5 border border-gray-200 shadow-sm rounded-xl bg-white mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                    {/* Search - Spans 5 columns */}
+                    <div className="lg:col-span-5 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input
                             type="text"
-                            placeholder="Search by ID or Location"
-                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm text-gray-700 placeholder:text-gray-400"
+                            placeholder="Search by ID, Type, or Location..."
+                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm text-gray-800 placeholder:text-gray-400"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
-                    {/* Filters - Right Aligned */}
-                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    {/* Filters - Spans 7 columns (Right Aligned on desktop) */}
+                    <div className="lg:col-span-7 flex flex-wrap items-center gap-3 lg:justify-end">
                         <div className="relative">
                             <select
                                 className="appearance-none pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none cursor-pointer hover:border-gray-300 transition-colors min-w-[140px]"

@@ -176,6 +176,7 @@
 .chartContainer {
     height: 250px;
     width: 100%;
+    min-width: 0;
 }
 
 /* Map Preview Card */
