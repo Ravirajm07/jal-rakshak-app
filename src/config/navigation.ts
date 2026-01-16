@@ -46,12 +46,7 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
         icon: Map,
         roles: ["admin"] // Hidden for civilians as requested
     },
-    {
-        label: "Complaints",
-        href: "/app/complaints",
-        icon: FileWarning,
-        roles: ["admin"] // Admin only
-    },
+
     {
         label: "Alerts",
         href: "/app/alerts",

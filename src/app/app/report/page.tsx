@@ -35,10 +35,10 @@ export default function ReportPage() {
     const [showTrackModal, setShowTrackModal] = useState(false);
     const [trackError, setTrackError] = useState("");
 
-    // ADMIN VIEW REDIRECT OR RENDER
-    if (userRole === "admin") {
-        return <AdminComplaintsView />;
-    }
+    // ADMIN VIEW - Allow admin to file reports too (Management removed as requested)
+    // if (userRole === "admin") {
+    //    return <AdminComplaintsView />;
+    // }
 
     // Handlers
     const handleTrackReport = () => {
