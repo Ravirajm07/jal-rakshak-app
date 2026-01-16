@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import styles from "./Dashboard.module.css";
 import dynamic from "next/dynamic";
+import { DecisionPanel } from "@/components/admin/DecisionPanel";
 
 // Dynamically import map for Dashboard (no SSR)
 const DashboardMap = dynamic(() => import("@/components/map/MapComponent"), {
@@ -51,6 +52,9 @@ export default function Dashboard() {
                     </Button>
                 </div>
             </div>
+
+            {/* Decision Support Panel (Admin Only) */}
+            <DecisionPanel />
 
             {/* KPI Cards */}
             <div className={styles.kpiGrid}>
