@@ -7,9 +7,9 @@ export async function GET() {
         await dbConnect();
         const complaints = await Complaint.find({}).sort({ createdAt: -1 });
         return NextResponse.json({ success: true, data: complaints });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Database Error:", error);
-        return NextResponse.json({ success: false, error: 'Failed to fetch data' }, { status: 500 });
+        return NextResponse.json({ success: false, error: error.message || 'Unknown DB Error' }, { status: 500 });
     }
 }
 
