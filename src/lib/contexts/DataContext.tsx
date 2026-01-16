@@ -47,7 +47,7 @@ interface DataContextType {
     complaints: Complaint[];
     login: (role: UserRole) => Promise<void>;
     logout: () => Promise<void>;
-    addComplaint: (complaint: Omit<Complaint, "_id" | "status" | "createdAt">) => Promise<void>;
+    addComplaint: (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => Promise<void>;
     updateComplaintStatus: (id: string, status: Complaint["status"], adminResponse?: string) => Promise<void>;
     loading: boolean;
 }
@@ -147,7 +147,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const addComplaint = async (complaint: Omit<Complaint, "_id" | "status" | "createdAt">) => {
+    const addComplaint = async (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => {
         try {
             const res = await fetch('/api/complaints', {
                 method: 'POST',
