@@ -29,6 +29,12 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
         roles: ["admin", "citizen"]
     },
     {
+        label: "Report Issue",
+        href: "/app/report",
+        icon: FileText,
+        roles: ["admin", "citizen"]
+    },
+    {
         label: "Analytics",
         href: "/app/analytics",
         icon: BarChart,
