@@ -146,13 +146,17 @@ npx cap open android
 
 ---
 
-## 🌐 Deployment (GitHub Pages)
-This repository is configured to automatically deploy to **GitHub Pages**.
+## 🌐 Deployment (Vercel)
 
-### How to Enable:
-1. Go to your GitHub Repository.
-2. Click **Settings** > **Pages** (in the sidebar).
-3. Under **Build and deployment** > **Source**, select **GitHub Actions**.
-4. The site will automatically build and deploy on your next push!
+**Live Demo:** [https://jal-rakshak-app.vercel.app/](https://jal-rakshak-app.vercel.app/)
+
+This project is deployed on **Vercel** with full API support.
+
+### How to Deploy
+1. Push code to GitHub.
+2. Import project in Vercel.
+3. Add Environment Variable:
+    - `MONGODB_URI`: Your MongoDB Atlas Connection String.
+4. Deploy!
 
 2026 © JalRakshak Team | Built for safe and smart cities.
