@@ -9,6 +9,10 @@ export async function GET() {
         return NextResponse.json({ success: true, data: complaints });
     } catch (error: any) {
         console.error("Database Error:", error);
+        // Differently handle connection errors vs query errors
+        if (error.name === 'MongooseServerSelectionError' || error.message.includes('buffering timed out')) {
+            return NextResponse.json({ success: false, error: 'Database Connection Failed' }, { status: 503 });
+        }
         return NextResponse.json({ success: false, error: error.message || 'Unknown DB Error' }, { status: 500 });
     }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import {
     LineChart,
@@ -162,6 +162,12 @@ const DATA_SETS = {
 
 export default function AnalyticsPage() {
     const [timeRange, setTimeRange] = useState<TimeRange>('week');
+    // Prevent hydration mismatch and size calculation errors
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const currentData = DATA_SETS[timeRange];
     // Cast strict keys for Recharts to avoid type complaint, though it usually handles it.
@@ -171,6 +177,10 @@ export default function AnalyticsPage() {
     const systemAnalysisText = useMemo(() => {
         return generateInsight(timeRange, currentData.level, currentData.quality);
     }, [timeRange, currentData]);
+
+    if (!isMounted) {
+        return <div className="p-10 flex justify-center text-gray-400">Loading Analytics...</div>;
+    }
 
     return (
         <div className={styles.container}>
@@ -205,7 +215,8 @@ export default function AnalyticsPage() {
                     <CardTitle>Water Level Trend ({timeRange === 'day' ? '24 Hours' : timeRange === 'year' ? '12 Months' : '7 Days'})</CardTitle>
                     <CardDescription>Measured in meters. Flood danger mark at 16m.</CardDescription>
                 </div>
-                <div className={styles.chartContainer}>
+                {/* Fixed height container for robustness */}
+                <div className={styles.chartContainer} style={{ minHeight: '300px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={currentData.level}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -237,7 +248,8 @@ export default function AnalyticsPage() {
                         <CardTitle>pH Levels</CardTitle>
                         <CardDescription>Acidity/Alkalinity trend.</CardDescription>
                     </div>
-                    <div className="h-[200px]">
+                    {/* Fixed height container for robustness */}
+                    <div className="h-[200px]" style={{ minHeight: '200px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={currentData.quality}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -255,7 +267,8 @@ export default function AnalyticsPage() {
                         <CardTitle>Turbidity (Cloudiness)</CardTitle>
                         <CardDescription>NTU values over the {timeRange}.</CardDescription>
                     </div>
-                    <div className="h-[200px]">
+                    {/* Fixed height container for robustness */}
+                    <div className="h-[200px]" style={{ minHeight: '200px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={currentData.quality}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
