@@ -75,6 +75,24 @@ export class GeminiService {
     private static getSimulatedResponse(prompt: string): string {
         const lower = prompt.toLowerCase();
 
+        // Specific Responses for Clickable Chips
+        if (prompt === "Is my area at flood risk today?") {
+            return "**Gemini (Analysis):** Based on real-time sensor data from Panchganga and Radhanagari Dam, your current location (Ward A) is in the **Green Zone (Safe)**. Water levels are at 18ft (Warning Level: 39ft). No immediate flood risk detected for the next 24 hours.";
+        }
+        if (prompt === "Current river water level status") {
+            return "**Gemini (River Watch):** Current Panchganga River Level is **18.2 ft** (Steady). \n\n- **Rajaram Bandhara**: 18.0 ft\n- **Radhanagari Discharge**: 1100 cusecs\n\nThe water level is well below the danger mark of 43ft.";
+        }
+        if (prompt === "Is the water safe to drink?") {
+            return "**Gemini (Quality Check):** Yes. The Water Quality Index (WQI) for your ward is **85 (Good)**. \n\n- **pH**: 7.2 (Neutral)\n- **Turbidity**: 2.1 NTU (Clear)\n\nThe water is safe for consumption. Regular chlorination was confirmed at 06:00 AM today.";
+        }
+        if (prompt === "Any active alerts in my ward?") {
+            return "**Gemini (Alerts):** There are **0 Critical Alerts** for your ward right now. \n\nHowever, the IMD has issued a **Yellow Alert (Heavy Rainfall)** for the Kolhapur district for tomorrow evening. Please keep your emergency kit ready as a precaution.";
+        }
+        if (prompt === "How do I raise a complaint?") {
+            return "**Gemini (Help):** To raise a complaint, please use the **'Report Issue'** tab in the sidebar menu.\n\n1. Click 'Report Issue'\n2. Select the problem type (e.g., Pipe Burst)\n3. Detect or Pin location\n4. Upload a photo (optional)\n\nFor life-threatening emergencies, call **112** immediately.";
+        }
+
+        // General keyword matching for other queries
         if (lower.includes("flood") || lower.includes("danger")) {
             return "**Gemini (Calculated):** Based on current sensor data, the water levels at Panchganga Ghat are rising. I recommend moving to higher ground (Zone 3) immediately. Emergency services have been notified.";
         }
