@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import {
     Search,
     Download,
-    Filter,
     Edit2,
     ChevronLeft,
     ChevronRight,
@@ -59,43 +58,46 @@ export default function ComplaintsPage() {
     };
 
     return (
-        <div className="p-8 space-y-6 max-w-[1600px] mx-auto font-inter bg-[#F8F9FA] min-h-screen">
+        <div className="p-6 md:p-8 space-y-6 max-w-[1400px] mx-auto font-inter bg-[#F8F9FA] min-h-screen">
 
-            {/* 1. Header Section - Clean & Separated */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+            {/* 1. Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Complaint Management</h1>
-                    <div className="flex items-center gap-2 text-gray-500 mt-2">
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Complaint Management</h1>
+                    <div className="flex items-center gap-2 text-gray-500 mt-1">
                         <RefreshCw size={14} />
-                        <p className="text-sm font-medium">Last updated: Just now</p>
+                        <p className="text-xs md:text-sm font-medium">Last updated: Just now</p>
                     </div>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-all">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all">
                     <Download size={18} />
                     Export Data
                 </Button>
             </div>
 
-            {/* 2. Filter Bar - Floating Card */}
-            <div className="bg-white p-2 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center">
-                {/* Search Input */}
-                <div className="relative flex-1 w-full">
+            {/* 2. Filter Bar - Strict Alignment */}
+            <div className="bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-2 items-center">
+                {/* Search - Padded to match table */}
+                <div className="relative flex-1 w-full md:max-w-md">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
                         placeholder="Search by ID or Location"
-                        className="w-full pl-11 pr-4 py-2.5 bg-white rounded-lg outline-none text-sm text-gray-700 placeholder:text-gray-400 focus:ring-0" // Clean input
+                        className="w-full pl-12 pr-4 py-2.5 bg-transparent rounded-lg outline-none text-sm text-gray-700 placeholder:text-gray-400"
                         value={searchTerm}
                         onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                     />
                 </div>
 
-                {/* Dropdowns & Reset */}
-                <div className="flex items-center gap-3 p-1 px-3 border-l border-gray-100 w-full md:w-auto overflow-x-auto">
+                {/* Spacer */}
+                <div className="flex-1 hidden md:block"></div>
+
+                {/* Filters Right Aligned */}
+                <div className="flex items-center gap-4 px-4 w-full md:w-auto overflow-x-auto border-t md:border-t-0 md:border-l border-gray-100 py-2 md:py-0">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">Type:</span>
                         <select
-                            className="appearance-none bg-transparent font-medium text-sm text-gray-900 outline-none cursor-pointer pr-4"
+                            className="appearance-none bg-transparent font-medium text-sm text-gray-900 outline-none cursor-pointer pr-6 py-1"
                             value={typeFilter}
                             onChange={(e) => { setTypeFilter(e.target.value); setCurrentPage(1); }}
                         >
@@ -106,10 +108,10 @@ export default function ComplaintsPage() {
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">Status:</span>
                         <select
-                            className="appearance-none bg-transparent font-medium text-sm text-gray-900 outline-none cursor-pointer pr-4"
+                            className="appearance-none bg-transparent font-medium text-sm text-gray-900 outline-none cursor-pointer pr-6 py-1"
                             value={statusFilter}
                             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                         >
@@ -122,25 +124,25 @@ export default function ComplaintsPage() {
 
                     <button
                         onClick={() => { setSearchTerm(""); setStatusFilter("All"); setTypeFilter("All"); setCurrentPage(1); }}
-                        className="ml-4 text-blue-600 hover:text-blue-700 text-sm font-semibold whitespace-nowrap"
+                        className="text-blue-600 hover:text-blue-700 text-sm font-semibold whitespace-nowrap ml-2"
                     >
                         Reset Filters
                     </button>
                 </div>
             </div>
 
-            {/* 3. Data Table */}
+            {/* 3. Table Card - Full Width Alignment */}
             <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden bg-white">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                         <thead className="bg-white border-b border-gray-100">
                             <tr>
-                                <th className="px-8 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider">ID</th>
+                                <th className="pl-8 pr-4 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider w-[120px]">ID</th>
                                 <th className="px-6 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider">Type</th>
                                 <th className="px-6 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider">Location</th>
                                 <th className="px-6 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider">Date</th>
                                 <th className="px-6 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider">Status</th>
-                                <th className="px-8 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider text-right">Action</th>
+                                <th className="pr-8 pl-4 py-5 font-bold text-gray-400 text-[11px] uppercase tracking-wider text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -148,11 +150,11 @@ export default function ComplaintsPage() {
                                 <tr><td colSpan={6} className="text-center py-10 text-gray-400">No complaints found</td></tr>
                             ) : paginatedItems.map((c, i) => (
                                 <tr key={c.id} className="group hover:bg-gray-50 transition-colors">
-                                    <td className="px-8 py-6 font-bold text-gray-800">
+                                    <td className="pl-8 pr-4 py-6 font-bold text-gray-900">
                                         #JR-204{i + (currentPage - 1) * 5 + 5}
                                     </td>
                                     <td className="px-6 py-6">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2">
                                             {getTypeIcon(c.type)}
                                             <span className="text-gray-700 font-medium">{c.type}</span>
                                         </div>
@@ -162,7 +164,6 @@ export default function ComplaintsPage() {
                                         {c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : "Oct 12, 2023"}
                                     </td>
                                     <td className="px-6 py-6">
-                                        {/* Status Badge - Specific Pastel Colors from Design */}
                                         <Badge variant="neutral" className={`
                                             !px-3 !py-1 !text-xs !font-bold !rounded-full border-0
                                             ${c.status === 'Resolved' ? '!bg-green-100 !text-green-600' :
@@ -177,11 +178,11 @@ export default function ComplaintsPage() {
                                             {c.status}
                                         </Badge>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
+                                    <td className="pr-8 pl-4 py-6 text-right">
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="border-blue-200 text-blue-600 hover:bg-blue-50 font-bold px-4 rounded-lg h-9"
+                                            className="border-blue-200 text-blue-600 hover:bg-blue-50 font-bold px-4 rounded-lg h-9 w-fit ml-auto"
                                         >
                                             <Edit2 size={14} className="mr-2" />
                                             Update
