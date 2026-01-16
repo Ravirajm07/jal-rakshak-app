@@ -80,8 +80,9 @@ export function CitizenDashboard() {
                 {/* Left: Report an Issue (7 cols in image context approx 60/40) */}
                 <div className="lg:col-span-7">
                     <Card className="p-6 h-full flex flex-col border border-slate-200 shadow-sm rounded-2xl">
-                        <div className="flex items-center gap-3 mb-6 border-l-4 border-blue-600 pl-3">
-                            <h2 className="text-lg font-bold text-slate-800">Report an Issue</h2>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                            <h2 className="text-lg font-bold text-slate-900">Report an Issue</h2>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -131,8 +132,9 @@ export function CitizenDashboard() {
                 {/* Right: Track Status (5 cols) */}
                 <div className="lg:col-span-5">
                     <Card className="p-6 h-full flex flex-col border border-slate-200 shadow-sm rounded-2xl bg-white">
-                        <div className="flex items-center gap-3 mb-6 border-l-4 border-blue-600 pl-3">
-                            <h2 className="text-lg font-bold text-slate-800">Track Status</h2>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                            <h2 className="text-lg font-bold text-slate-900">Track Status</h2>
                         </div>
 
                         {/* Tabs */}
@@ -152,7 +154,7 @@ export function CitizenDashboard() {
                                             <span className="font-bold text-slate-800">{item.type}</span>
                                         </div>
                                         <Badge className={`uppercase text-[10px] font-bold px-2 py-0.5 rounded ${item.status === 'Resolved' ? 'bg-green-100 text-green-700' :
-                                                item.status === 'In Progress' ? 'bg-amber-100 text-amber-700 transition-colors' : 'bg-blue-100 text-blue-700'
+                                            item.status === 'In Progress' ? 'bg-amber-100 text-amber-700 transition-colors' : 'bg-blue-100 text-blue-700'
                                             }`}>
                                             {item.status}
                                         </Badge>

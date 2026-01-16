@@ -45,8 +45,10 @@
 }
 
 .active {
-    background-color: var(--primary);
+    background-color: #2563eb; /* Exact Blue 600 */
     color: #fff;
+    font-weight: 500;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
 
 .footer {
