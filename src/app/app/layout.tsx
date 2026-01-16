@@ -29,31 +29,34 @@ export default function AppLayout({
 
     return (
         <div className={styles.layout}>
-            <SideDrawer />
+            {/* <SideDrawer /> Removed for Top-Nav Layout */}
 
             <div className={styles.mainWrapper}>
-                <header className={styles.header}>
-                    <div className={styles.headerLeft}>
-                        <div className="md:hidden">
-                            <CloudRain className="text-blue-600" />
+                <header className="bg-white border-b border-gray-200 sticky top-0 z-50 h-16 flex items-center justify-between px-8 shadow-sm">
+                    {/* Left: Logo */}
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-600 p-1.5 rounded-lg text-white">
+                            <CloudRain size={20} fill="currentColor" />
                         </div>
-                        {/* Breadcrumb or Title could go here */}
-                        {/* For now, minimal as in design */}
+                        <span className="font-bold text-xl text-gray-900 tracking-tight">JalRakshak</span>
                     </div>
 
-                    <div className={styles.headerRight}>
-                        <div className="flex bg-slate-100 rounded-full px-4 py-2 text-sm font-medium text-slate-600 items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            Kolhapur City
-                        </div>
+                    {/* Center: Navigation */}
+                    <nav className="hidden md:flex items-center gap-8">
+                        <a href="/app/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Dashboard</a>
+                        <a href="/app/complaints" className="text-sm font-bold text-blue-600 border-b-2 border-blue-600 py-5">Complaints</a>
+                        <a href="/app/map" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Map View</a>
+                        <a href="/app/settings" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Settings</a>
+                    </nav>
 
-                        <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-blue-600">
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="icon" className="relative text-gray-500 hover:bg-gray-100 rounded-full h-10 w-10">
                             <Bell size={20} />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                         </Button>
-
-                        <div className={styles.userProfile}>
-                            <User size={20} />
+                        <div className="h-9 w-9 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-full flex items-center justify-center text-white shadow-md border-2 border-white cursor-pointer">
+                            <User size={18} />
                         </div>
                     </div>
                 </header>
