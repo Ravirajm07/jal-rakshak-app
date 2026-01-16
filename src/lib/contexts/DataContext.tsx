@@ -50,6 +50,9 @@ interface DataContextType {
     addComplaint: (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => Promise<void>;
     updateComplaintStatus: (id: string, status: Complaint["status"], adminResponse?: string) => Promise<void>;
     loading: boolean;
+    isDemoMode: boolean;
+    toggleDemoMode: () => void;
+    setDemoRole: (role: UserRole) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -68,6 +71,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ]);
     const [complaints, setComplaints] = useState<Complaint[]>([]);
 
+    // Demo Mode State
+    const [isDemoMode, setIsDemoMode] = useState(false);
+    const [demoRole, setDemoRole] = useState<UserRole>("citizen");
+
     // Firebase Auth Listener
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -83,6 +90,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         return () => unsubscribe();
     }, []);
+
+    // Effect to handle demo mode overrides
+    const effectiveRole = isDemoMode ? demoRole : userRole;
 
     // Simulation Loop for Live Data
     useEffect(() => {
@@ -119,6 +129,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                     ...c,
                     id: c._id
                 }));
+                // Sort by latest first
+                mappedComplaints.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 setComplaints(mappedComplaints);
             }
         } catch (error) {
@@ -147,6 +159,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const toggleDemoMode = () => {
+        setIsDemoMode(prev => !prev);
+        // Default to citizen when entering demo mode
+        if (!isDemoMode) setDemoRole("citizen");
+    };
+
+    const setDemoRoleAction = (role: UserRole) => {
+        setDemoRole(role);
+    };
+
     const addComplaint = async (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => {
         try {
             const res = await fetch('/api/complaints', {
@@ -154,8 +176,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...complaint,
-                    userId: user?.uid || "anonymous",
-                    userEmail: user?.email || "anonymous"
+                    userId: user?.uid || "anonymous_demo_user",
+                    userEmail: user?.email || "citizen@jalrakshak.demo"
                 })
             });
             const data = await res.json();
@@ -195,7 +217,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     return (
         <DataContext.Provider value={{
-            userRole,
+            userRole: effectiveRole, // Use the effective role (real or demo)
             user,
             waterData,
             alerts,
@@ -204,7 +226,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
             logout,
             addComplaint,
             updateComplaintStatus,
-            loading
+            loading,
+            isDemoMode,
+            toggleDemoMode,
+            setDemoRole: setDemoRoleAction
         }}>
             {children}
             <ToastContainer toasts={toasts} removeToast={removeToast} />
