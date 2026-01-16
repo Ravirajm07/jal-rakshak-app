@@ -13,7 +13,7 @@ import dynamic from "next/dynamic";
 import { DecisionPanel } from "@/components/admin/DecisionPanel";
 import { useState } from "react";
 
-import { Tabs } from "@/components/ui/Tabs";
+
 
 // Dynamically import map for Dashboard (no SSR)
 const DashboardMap = dynamic(() => import("@/components/map/MapComponent"), {
@@ -37,15 +37,8 @@ const LEVEL_DATA = [
 
 export function AdminDashboard() {
     const { complaints, updateComplaintStatus } = useData();
-    const [activeTab, setActiveTab] = useState("all");
 
-    const filteredComplaints = complaints.filter(c => {
-        if (activeTab === 'all') return true;
-        if (activeTab === 'resolved') return c.status === 'Resolved';
-        if (activeTab === 'pending') return c.status !== 'Resolved';
-        if (activeTab === 'admin') return c.userEmail?.includes("admin") || c.type === "System Alert";
-        return true;
-    });
+    const filteredComplaints = complaints;
 
     return (
         <div className={styles.container}>
@@ -132,26 +125,15 @@ export function AdminDashboard() {
             {/* Complaint Management Section */}
             <Card className="mb-6 p-0 overflow-hidden border-t-4 border-t-indigo-500 shadow-md">
                 <div className="p-4 border-b border-gray-100 bg-white">
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-center">
                         <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                             <FileText className="text-indigo-600" size={20} />
                             Complaint Management
                         </h3>
                         <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            Total: {filteredComplaints.length}
+                            Total: {complaints.length}
                         </div>
                     </div>
-
-                    <Tabs
-                        tabs={[
-                            { id: 'all', label: 'All Complaints' },
-                            { id: 'pending', label: 'Not Solved' },
-                            { id: 'resolved', label: 'Solved' },
-                            { id: 'admin', label: 'Admin Internal' }
-                        ]}
-                        activeTab={activeTab}
-                        onTabChange={setActiveTab}
-                    />
                 </div>
 
                 <div className="overflow-x-auto min-h-[300px]">
