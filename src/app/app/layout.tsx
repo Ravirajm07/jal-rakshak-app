@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { SideDrawer } from "@/components/layout/SideDrawer";
 import styles from "@/components/layout/MainLayout.module.css";
-import { Bell, User, CloudRain, Menu, X } from "lucide-react";
+import { Bell, User, CloudRain, Menu, X, Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DisclaimerModal } from "@/components/common/DisclaimerModal";
 
@@ -66,6 +66,11 @@ export default function AppLayout({
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                             Kolhapur City
                         </div>
+
+                        <button className="flex items-center gap-2 bg-blue-600 text-white rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors">
+                            <Info size={16} />
+                            Ward C: Safe Levels
+                        </button>
 
                         <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-blue-600">
                             <Bell size={20} />
