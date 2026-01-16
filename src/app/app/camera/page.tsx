@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import styles from "./Camera.module.css";
 import { Button } from "@/components/ui/Button";
-import { Maximize2, VolumeX, AlertCircle, RefreshCw, Video, Activity, ShieldCheck } from "lucide-react";
+import { Input } from "@/components/ui/Input";
+import { Maximize2, VolumeX, AlertCircle, RefreshCw, Video, Activity, ShieldCheck, Plus, X } from "lucide-react";
 
 interface CameraFeed {
     id: string;
@@ -11,19 +12,24 @@ interface CameraFeed {
     status: 'live' | 'offline' | 'maintenance';
     viewers: number;
     color: string; // To simulate different feeds
+    url?: string;
+    type: 'simulated' | 'ip';
 }
 
-const CAMERAS: CameraFeed[] = [
-    { id: 'CAM-01', location: 'Panchganga Ghat (North)', status: 'live', viewers: 124, color: '#1e293b' },
-    { id: 'CAM-02', location: 'Rankala Tower', status: 'live', viewers: 85, color: '#0f172a' },
-    { id: 'CAM-03', location: 'Shiroli Bridge', status: 'maintenance', viewers: 0, color: '#334155' },
-    { id: 'CAM-04', location: 'Bapat Camp Low-lying', status: 'live', viewers: 210, color: '#172554' },
-    { id: 'CAM-05', location: 'Market Yard Sump', status: 'live', viewers: 45, color: '#1e1b4b' },
-    { id: 'CAM-06', location: 'City Entrance', status: 'offline', viewers: 0, color: '#000000' },
+const INITIAL_CAMERAS: CameraFeed[] = [
+    { id: 'CAM-01', location: 'Panchganga Ghat (North)', status: 'live', viewers: 124, color: '#1e293b', type: 'simulated' },
+    { id: 'CAM-02', location: 'Rankala Tower', status: 'live', viewers: 85, color: '#0f172a', type: 'simulated' },
+    { id: 'CAM-03', location: 'Shiroli Bridge', status: 'maintenance', viewers: 0, color: '#334155', type: 'simulated' },
+    { id: 'CAM-04', location: 'Bapat Camp Low-lying', status: 'live', viewers: 210, color: '#172554', type: 'simulated' },
+    { id: 'CAM-05', location: 'Market Yard Sump', status: 'live', viewers: 45, color: '#1e1b4b', type: 'simulated' },
+    { id: 'CAM-06', location: 'City Entrance', status: 'offline', viewers: 0, color: '#000000', type: 'simulated' },
 ];
 
 export default function CameraPage() {
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [cameras, setCameras] = useState<CameraFeed[]>(INITIAL_CAMERAS);
+    const [showModal, setShowModal] = useState(false);
+    const [newCam, setNewCam] = useState({ location: '', ip: '' });
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -38,6 +44,37 @@ export default function CameraPage() {
         return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
     };
 
+    const handleAddCamera = () => {
+        if (!newCam.location || !newCam.ip) {
+            alert("Please enter both location and IP/URL");
+            return;
+        }
+
+        // Auto-format IP to MJPEG URL if just IP is provided (Common for IP Webcam App)
+        // e.g., 192.168.1.5 -> http://192.168.1.5:8080/video
+        let streamUrl = newCam.ip;
+        if (!streamUrl.startsWith('http')) {
+            // Assume typical specific port for IP Webcam if only IP is given, or just try to use as is if they know what they are doing.
+            // But usually users just type IP. Let's make it easy for "IP Webcam" Android app which is common.
+            // Defaulting to typical pattern: http://<IP>:8080/video
+            streamUrl = `http://${newCam.ip}:8080/video`;
+        }
+
+        const newFeed: CameraFeed = {
+            id: `IP-${Date.now()}`,
+            location: newCam.location,
+            status: 'live',
+            viewers: 1,
+            color: '#000',
+            type: 'ip',
+            url: streamUrl
+        };
+
+        setCameras(prev => [newFeed, ...prev]);
+        setNewCam({ location: '', ip: '' });
+        setShowModal(false);
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -45,7 +82,10 @@ export default function CameraPage() {
                     <h1 className={styles.title}>Live Surveillance</h1>
                     <p className={styles.subtitle}>Real-time CCTV feeds from critical flood monitoring zones.</p>
                 </div>
-                <div>
+                <div className="flex gap-3">
+                    <Button onClick={() => setShowModal(true)}>
+                        <Plus size={16} style={{ marginRight: '0.5rem' }} /> Add Camera
+                    </Button>
                     <Button variant="outline">
                         <RefreshCw size={16} style={{ marginRight: '0.5rem' }} /> Refresh Feeds
                     </Button>
@@ -59,7 +99,7 @@ export default function CameraPage() {
                         <Video size={24} />
                     </div>
                     <div>
-                        <div className={styles.statValue}>{CAMERAS.filter(c => c.status === 'live').length} / {CAMERAS.length}</div>
+                        <div className={styles.statValue}>{cameras.filter(c => c.status === 'live').length} / {cameras.length}</div>
                         <div className={styles.statLabel}>Active Cameras</div>
                     </div>
                 </div>
@@ -68,7 +108,7 @@ export default function CameraPage() {
                         <Activity size={24} />
                     </div>
                     <div>
-                        <div className={styles.statValue}>464</div>
+                        <div className={styles.statValue}>{464 + cameras.filter(c => c.type === 'ip').length}</div>
                         <div className={styles.statLabel}>Total Viewers</div>
                     </div>
                 </div>
@@ -85,14 +125,26 @@ export default function CameraPage() {
 
             {/* Grid */}
             <div className={styles.grid}>
-                {CAMERAS.map((cam) => (
+                {cameras.map((cam) => (
                     <div key={cam.id} className={styles.cameraCard}>
                         {cam.status === 'live' ? (
-                            <div className={styles.feedPlaceholder} style={{ background: `linear-gradient(45deg, ${cam.color}, #000)` }}>
-                                {/* Simulated Content */}
-                                <div style={{ opacity: 0.1 }}>
-                                    <Video size={64} />
-                                </div>
+                            <div className={styles.feedPlaceholder} style={{ background: cam.type === 'ip' ? '#000' : `linear-gradient(45deg, ${cam.color}, #000)` }}>
+                                {cam.type === 'ip' && cam.url ? (
+                                    <img
+                                        src={cam.url}
+                                        alt={cam.location}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                            // You could show an error icon here
+                                        }}
+                                    />
+                                ) : (
+                                    /* Simulated Content */
+                                    <div style={{ opacity: 0.1 }}>
+                                        <Video size={64} />
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className={styles.feedPlaceholder} style={{ background: '#111' }}>
@@ -129,6 +181,48 @@ export default function CameraPage() {
                     </div>
                 ))}
             </div>
+
+            {/* Add Camera Modal */}
+            {showModal && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modal}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>Add IP Camera</h3>
+                            <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.modalBody}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Camera Location / Name</label>
+                                <Input
+                                    className={styles.input}
+                                    placeholder="e.g. Mobile Feed 1"
+                                    value={newCam.location}
+                                    onChange={(e) => setNewCam({ ...newCam, location: e.target.value })}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Camera IP Address</label>
+                                <Input
+                                    className={styles.input}
+                                    placeholder="e.g. 192.168.1.5"
+                                    value={newCam.ip}
+                                    onChange={(e) => setNewCam({ ...newCam, ip: e.target.value })}
+                                />
+                                <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.5rem' }}>
+                                    Enter the IP shown in your IP Webcam app (e.g. <b>192.168.29.45</b>). <br />
+                                    We will automatically connect to port 8080/video.
+                                </p>
+                            </div>
+                        </div>
+                        <div className={styles.modalFooter}>
+                            <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
+                            <Button onClick={handleAddCamera}>Join & Show</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
