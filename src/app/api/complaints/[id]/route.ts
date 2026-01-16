@@ -4,12 +4,12 @@ import Complaint from '@/models/Complaint';
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
         const body = await request.json();
-        const { id } = params;
+        const { id } = await params;
 
         const complaint = await Complaint.findByIdAndUpdate(
             id,
