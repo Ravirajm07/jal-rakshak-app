@@ -9,16 +9,16 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onTabChange, className = "" }: TabsProps) {
     return (
-        <div className={`flex space-x-1 rounded-xl bg-slate-100 p-1 ${className}`}>
+        <div className={`inline-flex items-center justify-center rounded-lg bg-slate-100 p-1 text-slate-500 ${className}`}>
             {tabs.map((tab) => (
                 <button
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}
                     className={`
-                        w-full rounded-lg py-2.5 text-sm font-medium leading-5 transition-all duration-200
+                        inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
                         ${activeTab === tab.id
-                            ? 'bg-white text-blue-700 shadow ring-1 ring-black/5'
-                            : 'text-slate-500 hover:bg-white/50 hover:text-slate-700'}
+                            ? 'bg-white text-slate-950 shadow-sm'
+                            : 'hover:bg-slate-200/50 hover:text-slate-950'}
                     `}
                 >
                     {tab.label}
