@@ -47,7 +47,7 @@ export class GeminiService {
 
         // REAL API CALL
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite-preview-02-05:generateContent?key=${key}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
