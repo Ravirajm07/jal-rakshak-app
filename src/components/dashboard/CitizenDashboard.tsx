@@ -1,126 +1,248 @@
 "use client";
 
-import { useState } from "react";
 import { useData } from "@/lib/contexts/DataContext";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { AlertCircle, MapPin, Droplets, Play, Send } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { Droplets, AlertTriangle, CheckCircle, FileText, TrendingUp } from "lucide-react";
+import {
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
+import styles from "@/app/app/dashboard/Dashboard.module.css";
+import dynamic from "next/dynamic";
+import { useState, useEffect, useMemo } from "react";
+
+// Dynamically import map for Dashboard (no SSR)
+const DashboardMap = dynamic(() => import("@/components/map/MapComponent"), {
+    ssr: false,
+    loading: () => <div className={styles.mapLoading}>Loading Map...</div>
+});
+
+const LEVEL_DATA = [
+    { time: "12 AM", level: 40 },
+    { time: "2 AM", level: 41 },
+    { time: "4 AM", level: 40.5 },
+    { time: "6 AM", level: 42 },
+    { time: "8 AM", level: 43.5 },
+    { time: "10 AM", level: 44.2 },
+    { time: "12 PM", level: 43.8 },
+    { time: "2 PM", level: 44.5 },
+    { time: "4 PM", level: 45.2 },
+    { time: "6 PM", level: 45.0 },
+    { time: "8 PM", level: 44.8 },
+];
 
 export function CitizenDashboard() {
-    const { toggleDemoMode } = useData();
-    const [submitting, setSubmitting] = useState(false);
+    const { complaints, user } = useData();
+    const [isMounted, setIsMounted] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setSubmitting(false);
-        alert("Complaint Submitted!");
-    };
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Filter complaints to only show the current user's complaints
+    const userComplaints = useMemo(() => {
+        if (!user?.email) return [];
+        return complaints.filter(c => c.userEmail === user.email || c.userId === user.uid);
+    }, [complaints, user]);
+
+    const activeComplaintsCount = userComplaints.filter(c => c.status !== 'Resolved').length;
+    const resolvedComplaintsCount = userComplaints.filter(c => c.status === 'Resolved').length;
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-8 min-h-screen pb-24">
-            {/* Welcome Section */}
-            <div className="flex flex-col gap-1">
-                <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Welcome, Citizen</h1>
-                <p className="text-slate-600 text-base font-normal">Stay safe and help us keep the city clean.</p>
+        <div className={styles.container}>
+            {/* Header Section */}
+            <div className={styles.header}>
+                <div>
+                    <h1 className={styles.title}>City Overview</h1>
+                    <p className={styles.subtitle}>Real-time monitoring for Kolhapur District • Last updated: Just now</p>
+                </div>
             </div>
 
-            {/* Alerts Section - Two Cards Side by Side */}
-            <div className="grid md:grid-cols-2 gap-6">
-                {/* Flood Warning Card */}
-                <Card className="bg-red-50 border-red-200 shadow-sm p-6 flex items-start gap-4">
-                    <div className="p-2.5 bg-white rounded-full text-red-600 shrink-0">
-                        <AlertCircle size={20} />
+            {/* KPI Cards */}
+            <div className={styles.kpiGrid}>
+                {/* Safe - Emerald */}
+                <Card className={styles.kpiCard} style={{ borderLeftColor: '#10b981' }}>
+                    <div className={styles.kpiTop}>
+                        <div className={styles.kpiLabel}>Water Quality</div>
+                        <div className={styles.kpiIcon} style={{ backgroundColor: '#d1fae5', color: '#059669' }}>
+                            <Droplets size={18} />
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <h3 className="font-bold text-red-900 text-lg mb-1">Flood Warning</h3>
-                        <p className="text-red-800 text-sm leading-relaxed mb-2">
-                            Panchganga River level rising above 45ft. Evacuation protocols active for low-lying areas.
-                        </p>
-                        <p className="text-red-600 text-xs font-medium">10 MINS AGO</p>
+                    <div className={styles.kpiValue}>Safe</div>
+                    <div className={styles.kpiStatus} style={{ color: '#059669' }}>
+                        <TrendingUp size={14} /> Optimal Levels
                     </div>
                 </Card>
 
-                {/* Service Restored Card */}
-                <Card className="bg-blue-50 border-blue-200 shadow-sm p-6 flex items-start gap-4">
-                    <div className="p-2.5 bg-white rounded-full text-blue-600 shrink-0">
-                        <Droplets size={20} />
+                {/* Flood - Blue */}
+                <Card className={styles.kpiCard} style={{ borderLeftColor: '#3b82f6' }}>
+                    <div className={styles.kpiTop}>
+                        <div className={styles.kpiLabel}>Flood Risk</div>
+                        <div className={styles.kpiIcon} style={{ backgroundColor: '#dbeafe', color: '#2563eb' }}>
+                            <CheckCircle size={18} />
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <h3 className="font-bold text-blue-900 text-lg mb-1">Service Restored</h3>
-                        <p className="text-blue-800 text-sm leading-relaxed mb-2">
-                            Safe drinking water supply has been fully restored in Ward C following maintenance work.
-                        </p>
-                        <p className="text-blue-600 text-xs font-medium">2 HOURS AGO</p>
+                    <div className={styles.kpiValue}>Normal</div>
+                    <div className={styles.kpiStatus} style={{ color: '#64748b' }}>
+                        2ft below warning level
+                    </div>
+                </Card>
+
+                {/* Complaints - Amber - Only user's complaints */}
+                <Card className={styles.kpiCard} style={{ borderLeftColor: '#f59e0b' }}>
+                    <div className={styles.kpiTop}>
+                        <div className={styles.kpiLabel}>Active Complaints</div>
+                        <div className={styles.kpiIcon} style={{ backgroundColor: '#fef3c7', color: '#d97706' }}>
+                            <AlertTriangle size={18} />
+                        </div>
+                    </div>
+                    <div className={styles.kpiValue}>{activeComplaintsCount}</div>
+                    <div className={styles.kpiStatus} style={{ color: '#d97706' }}>
+                        {activeComplaintsCount > 0 ? 'Requires Attention' : 'No Active Issues'}
+                    </div>
+                </Card>
+
+                {/* Resolved - Indigo - Only user's resolved complaints */}
+                <Card className={styles.kpiCard} style={{ borderLeftColor: '#6366f1' }}>
+                    <div className={styles.kpiTop}>
+                        <div className={styles.kpiLabel}>Resolved Cases</div>
+                        <div className={styles.kpiIcon} style={{ backgroundColor: '#e0e7ff', color: '#4f46e5' }}>
+                            <FileText size={18} />
+                        </div>
+                    </div>
+                    <div className={styles.kpiValue}>{resolvedComplaintsCount}</div>
+                    <div className={styles.kpiStatus} style={{ color: '#059669' }}>
+                        {resolvedComplaintsCount > 0 ? '↑ 15% this week' : 'No resolved cases yet'}
                     </div>
                 </Card>
             </div>
 
-            {/* Main Content - Report an Issue */}
-            <div className="max-w-2xl">
-                <Card className="p-0 border border-slate-200 shadow-md rounded-xl overflow-hidden">
-                    <div className="bg-slate-50 border-b border-slate-200 px-6 py-4">
-                        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <div className="w-1 h-5 bg-blue-600 rounded"></div>
-                            Report an Issue
-                        </h2>
-                    </div>
-                    <div className="p-6">
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-700">Issue Type</label>
-                                <select className="w-full bg-white border-slate-200 rounded-lg p-3 text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all">
-                                    <option>Pipe Burst</option>
-                                    <option>Water Logging</option>
-                                    <option>Contamination</option>
-                                    <option>Other</option>
-                                </select>
+            {/* Main Content Grid */}
+            <div className={styles.mainGrid}>
+                {/* Left: Water Level Graph */}
+                <div className={styles.leftColumn}>
+                    <Card className={styles.chartCard}>
+                        <div className={styles.chartHeader}>
+                            <div className={styles.chartTitle}>
+                                <h3>Live Water Levels</h3>
+                                <p>Panchganga River • Last 24 Hours</p>
                             </div>
+                            <Badge variant="danger" className="animate-pulse">● LIVE</Badge>
+                        </div>
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-700">Location</label>
-                                <div className="relative">
-                                    <MapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Ward C, Near Shivaji Statue"
-                                        className="w-full bg-white border-slate-200 rounded-lg pl-10 pr-4 py-3 text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
-                                    />
+                        <div className={styles.bigMetric}>
+                            <span className={styles.metricValue}>45.2</span>
+                            <span className={styles.metricUnit}>ft</span>
+                            <span className={styles.metricLabel}>Current Level</span>
+                        </div>
+
+                        <div className={styles.chartContainer} style={{ height: 300, width: "100%", minHeight: 300 }}>
+                            {isMounted ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={LEVEL_DATA}>
+                                        <defs>
+                                            <linearGradient id="colorLevel" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                        <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                                        />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="level"
+                                            stroke="#2563eb"
+                                            strokeWidth={4}
+                                            fillOpacity={1}
+                                            fill="url(#colorLevel)"
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                                    Loading Chart Data...
                                 </div>
+                            )}
+                        </div>
+                    </Card>
+
+                    {/* Map Preview at Bottom */}
+                    <Card className={styles.mapCard}>
+                        <div className="w-full h-full">
+                            <DashboardMap waterLevel={13.8} />
+                        </div>
+                    </Card>
+                </div>
+
+                {/* Right: Quality Indicators column */}
+                <div className={styles.rightColumn}>
+                    {/* Overall Status */}
+                    <Card className={styles.statusSummary}>
+                        <div className={styles.statusHeader}>
+                            <h3 className={styles.statusTitle}>Water Status: SAFE</h3>
+                            <div className={styles.checkIcon}>
+                                <CheckCircle size={20} />
                             </div>
+                        </div>
+                        <p className={styles.statusDesc}>All parameters within limits</p>
+                    </Card>
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-700">Description</label>
-                                <textarea
-                                    rows={4}
-                                    placeholder="Describe the issue briefly..."
-                                    className="w-full bg-white border-slate-200 rounded-lg p-3 text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all resize-none"
-                                />
+                    <h3 className={styles.sectionTitle}>Quality Indicators</h3>
+
+                    {/* pH */}
+                    <Card className={styles.qualityCard}>
+                        <div className={styles.qualityLeft}>
+                            <div className={styles.qualityIcon} style={{ backgroundColor: '#eff6ff', color: '#2563eb' }}>
+                                <Droplets size={20} />
                             </div>
+                            <div>
+                                <div className={styles.qualityName}>pH Level</div>
+                                <div className={styles.qualityTarget}>Target: 6.5 - 8.5</div>
+                            </div>
+                        </div>
+                        <div className={styles.qualityRight}>
+                            <div className={styles.qualityValue}>7.2</div>
+                            <div className={styles.qualityStatus}>Good</div>
+                        </div>
+                    </Card>
 
-                            <Button
-                                type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2"
-                                disabled={submitting}
-                            >
-                                <Send size={16} />
-                                {submitting ? "Submitting Report..." : "Submit Report"}
-                            </Button>
-                        </form>
-                    </div>
-                </Card>
-            </div>
+                    {/* Turbidity */}
+                    <Card className={styles.qualityCard}>
+                        <div className={styles.qualityLeft}>
+                            <div className={styles.qualityIcon} style={{ backgroundColor: '#faf5ff', color: '#9333ea' }}>
+                                <Droplets size={20} />
+                            </div>
+                            <div>
+                                <div className={styles.qualityName}>Turbidity</div>
+                                <div className={styles.qualityTarget}>Clarity</div>
+                            </div>
+                        </div>
+                        <div className={styles.qualityRight}>
+                            <div className={styles.qualityValue}>2.1</div>
+                            <div className={styles.qualityStatus} style={{ color: '#059669' }}>Low</div>
+                        </div>
+                    </Card>
 
-            {/* Bottom Action - Enable Demo Mode */}
-            <div className="fixed bottom-6 right-6 z-50">
-                <button
-                    onClick={toggleDemoMode}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-md flex items-center gap-2 transition-all"
-                >
-                    <Play size={16} />
-                    Enable Demo Mode
-                </button>
+                    {/* Chlorine */}
+                    <Card className={styles.qualityCard}>
+                        <div className={styles.qualityLeft}>
+                            <div className={styles.qualityIcon} style={{ backgroundColor: '#f0fdf4', color: '#0d9488' }}>
+                                <Droplets size={20} />
+                            </div>
+                            <div>
+                                <div className={styles.qualityName}>Chlorine</div>
+                                <div className={styles.qualityTarget}>Disinfectant</div>
+                            </div>
+                        </div>
+                        <div className={styles.qualityRight}>
+                            <div className={styles.qualityValue}>0.5</div>
+                            <div className={styles.qualityStatus}>Safe</div>
+                        </div>
+                    </Card>
+                </div>
             </div>
         </div>
     );
