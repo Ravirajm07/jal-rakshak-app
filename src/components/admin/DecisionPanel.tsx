@@ -115,8 +115,8 @@ export const DecisionPanel = () => {
                 </Button>
                 {decision.status !== 'normal' && (
                     <Button variant="danger" size="sm">
-                        <Megaphone size={16} className="mr-2" />
-                        Initiate Action
+                        <Megaphone size={16} style={{ marginRight: '8px' }} />
+                        <span>Initiate Action</span>
                     </Button>
                 )}
             </div>
