@@ -29,7 +29,7 @@ interface Alert {
 export interface Complaint {
     _id: string; // MongoDB ID
     id: string; // Frontend compatibility
-    type: "Pipe Burst" | "Water Logging" | "Sewage Leak" | "Quality Issue" | "Other";
+    type: "Pipe Burst" | "Water Logging" | "Sewage Leak" | "Quality Issue" | "Other" | "System Alert";
     location: string;
     status: "Open" | "In Progress" | "Resolved";
     description?: string;
