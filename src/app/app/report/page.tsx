@@ -4,7 +4,7 @@ import { useData } from "@/lib/contexts/DataContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X, CheckCircle } from "lucide-react";
 import styles from "./Report.module.css";
 import dynamic from "next/dynamic";
@@ -26,6 +26,8 @@ export default function ReportPage() {
         location: "",
         description: "",
     });
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Tracking State
     const [trackId, setTrackId] = useState("");
@@ -151,6 +153,7 @@ export default function ReportPage() {
                             <input
                                 type="file"
                                 id="evidence-upload"
+                                ref={fileInputRef}
                                 className="hidden"
                                 accept="image/png, image/jpeg, image/gif, image/svg+xml"
                                 onChange={(e) => {
@@ -163,7 +166,7 @@ export default function ReportPage() {
                             />
                             <div
                                 className={styles.uploadBox}
-                                onClick={() => document.getElementById('evidence-upload')?.click()}
+                                onClick={() => fileInputRef.current?.click()}
                             >
                                 <div className={styles.uploadIconCircle}>
                                     <CloudUpload size={20} />
