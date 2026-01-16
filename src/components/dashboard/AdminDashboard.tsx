@@ -13,6 +13,8 @@ import dynamic from "next/dynamic";
 import { DecisionPanel } from "@/components/admin/DecisionPanel";
 import { useState } from "react";
 
+import { Tabs } from "@/components/ui/Tabs";
+
 // Dynamically import map for Dashboard (no SSR)
 const DashboardMap = dynamic(() => import("@/components/map/MapComponent"), {
     ssr: false,
@@ -35,11 +37,15 @@ const LEVEL_DATA = [
 
 export function AdminDashboard() {
     const { complaints, updateComplaintStatus } = useData();
-    const [filterStatus, setFilterStatus] = useState<string>("All");
+    const [activeTab, setActiveTab] = useState("all");
 
-    const filteredComplaints = filterStatus === "All"
-        ? complaints
-        : complaints.filter(c => c.status === filterStatus);
+    const filteredComplaints = complaints.filter(c => {
+        if (activeTab === 'all') return true;
+        if (activeTab === 'resolved') return c.status === 'Resolved';
+        if (activeTab === 'pending') return c.status !== 'Resolved';
+        if (activeTab === 'admin') return c.userEmail?.includes("admin") || c.type === "System Alert";
+        return true;
+    });
 
     return (
         <div className={styles.container}>
@@ -125,26 +131,30 @@ export function AdminDashboard() {
 
             {/* Complaint Management Section */}
             <Card className="mb-6 p-0 overflow-hidden border-t-4 border-t-indigo-500 shadow-md">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
-                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <FileText className="text-indigo-600" size={20} />
-                        Complaint Management
-                    </h3>
-                    <div className="flex items-center gap-2">
-                        <Filter size={16} className="text-gray-400" />
-                        <select
-                            className="text-sm border-none bg-gray-50 rounded-md p-1 focus:ring-0 text-gray-600 font-medium"
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                        >
-                            <option value="All">All Status</option>
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Resolved">Resolved</option>
-                        </select>
+                <div className="p-4 border-b border-gray-100 bg-white">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <FileText className="text-indigo-600" size={20} />
+                            Complaint Management
+                        </h3>
+                        <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            Total: {filteredComplaints.length}
+                        </div>
                     </div>
+
+                    <Tabs
+                        tabs={[
+                            { id: 'all', label: 'All Complaints' },
+                            { id: 'pending', label: 'Not Solved' },
+                            { id: 'resolved', label: 'Solved' },
+                            { id: 'admin', label: 'Admin Internal' }
+                        ]}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                    />
                 </div>
-                <div className="overflow-x-auto">
+
+                <div className="overflow-x-auto min-h-[300px]">
                     <table className="w-full text-sm text-left">
                         <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b">
                             <tr>
@@ -159,7 +169,7 @@ export function AdminDashboard() {
                             {filteredComplaints.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                                        No complaints found.
+                                        No complaints found in this category.
                                     </td>
                                 </tr>
                             ) : (
@@ -168,6 +178,11 @@ export function AdminDashboard() {
                                         <td className="px-6 py-4 font-medium text-gray-900">
                                             {complaint.type}
                                             <div className="text-xs font-normal text-gray-500 mt-1 truncate max-w-[200px]">{complaint.description}</div>
+                                            {(complaint.userEmail?.includes("admin") || complaint.type === "System Alert") && (
+                                                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                                    Internal
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 text-gray-600">{complaint.location}</td>
                                         <td className="px-6 py-4 text-gray-500">
