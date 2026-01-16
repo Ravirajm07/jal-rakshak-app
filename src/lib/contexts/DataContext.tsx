@@ -28,6 +28,7 @@ interface Alert {
 
 export interface Complaint {
     _id: string; // MongoDB ID
+    id: string; // Frontend compatibility
     type: "Pipe Burst" | "Water Logging" | "Sewage Leak" | "Quality Issue" | "Other";
     location: string;
     status: "Open" | "In Progress" | "Resolved";
@@ -113,7 +114,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
             const res = await fetch('/api/complaints');
             const data = await res.json();
             if (data.success) {
-                setComplaints(data.data);
+                // Map _id to id for frontend compatibility
+                const mappedComplaints = data.data.map((c: any) => ({
+                    ...c,
+                    id: c._id
+                }));
+                setComplaints(mappedComplaints);
             }
         } catch (error) {
             console.error("Failed to fetch complaints:", error);
