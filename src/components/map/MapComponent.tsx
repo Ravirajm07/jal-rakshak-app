@@ -72,8 +72,27 @@ function ResetCenterView({ center }: { center: [number, number] }) {
     return null;
 }
 
-export default function MapComponent() {
+const EVACUATION_CENTERS = [
+    { id: 101, lat: 16.7150, lng: 74.2550, name: "New College Shelter", capacity: 500 },
+    { id: 102, lat: 16.6900, lng: 74.2600, name: "Rajarampuri Hall", capacity: 300 },
+];
+
+export default function MapComponent({ waterLevel = 12 }: { waterLevel?: number }) {
     const center: [number, number] = [16.7050, 74.2433]; // Kolhapur Coordinates
+
+    // Dynamic Logic
+    let zoneColor = "#10b981"; // Green (Safe)
+    let radius = 800; // Base radius
+    let isCritical = false;
+
+    if (waterLevel > 14 && waterLevel <= 16) {
+        zoneColor = "#f59e0b"; // Amber (Warning)
+        radius = 1200;
+    } else if (waterLevel > 16) {
+        zoneColor = "#ef4444"; // Red (Danger)
+        radius = 2000;
+        isCritical = true;
+    }
 
     return (
         <div className={styles.mapContainer}>
@@ -93,10 +112,16 @@ export default function MapComponent() {
                 {/* Flood Risk Zone Circle */}
                 <Circle
                     center={[16.7050, 74.2433]}
-                    pathOptions={{ fillColor: 'red', color: 'red', fillOpacity: 0.2, weight: 1 }}
-                    radius={800}
+                    pathOptions={{
+                        fillColor: zoneColor,
+                        color: zoneColor,
+                        fillOpacity: isCritical ? 0.4 : 0.2,
+                        weight: isCritical ? 2 : 1
+                    }}
+                    radius={radius}
                 />
 
+                {/* Standard Markers */}
                 {MARKERS.map((marker) => (
                     <Marker
                         key={marker.id}
@@ -110,9 +135,28 @@ export default function MapComponent() {
                                     {marker.status.toUpperCase()}
                                 </Badge>
                                 <p className="text-xs text-slate-500 leading-snug">{marker.details}</p>
-                                <Button size="sm" variant="outline" fullWidth className="h-8 text-xs mt-1">
-                                    View Details
-                                </Button>
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
+
+                {/* Conditional Evacuation Markers */}
+                {isCritical && EVACUATION_CENTERS.map((center) => (
+                    <Marker
+                        key={center.id}
+                        position={[center.lat, center.lng]}
+                        icon={L.divIcon({
+                            className: 'evac-icon',
+                            html: `<div style="background: white; border: 2px solid #2563eb; color: #2563eb; font-weight: bold; border-radius: 4px; padding: 2px 4px; font-size: 10px; white-space: nowrap;">🛡️ EVAC</div>`,
+                            iconSize: [50, 20],
+                            iconAnchor: [25, 10]
+                        })}
+                    >
+                        <Popup>
+                            <div className="p-1">
+                                <h3 className="font-bold text-sm text-blue-700">{center.name}</h3>
+                                <p className="text-xs text-slate-600">Capacity: {center.capacity} people</p>
+                                <Badge variant="neutral" className="mt-1 bg-blue-100 text-blue-800">Active Shelter</Badge>
                             </div>
                         </Popup>
                     </Marker>

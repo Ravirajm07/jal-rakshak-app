@@ -186,7 +186,7 @@ export function AdminDashboard() {
                     {/* Map Preview at Bottom */}
                     <Card className={styles.mapCard}>
                         <div className="w-full h-full">
-                            <DashboardMap />
+                            <DashboardMap waterLevel={13.8} />
                         </div>
                     </Card>
                 </div>
