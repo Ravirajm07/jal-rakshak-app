@@ -69,6 +69,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         { id: 1, message: "Flood Warning: Panchganga River level rising above 45ft.", severity: "danger", timestamp: "10 mins ago" },
         { id: 2, message: "Safe drinking water supply restored in Ward C.", severity: "safe", timestamp: "2 hours ago" },
     ]);
+
+    // Demo Complaints Data
+    const DEMO_COMPLAINTS: Complaint[] = [
+        { _id: '1', id: '1', type: 'Pipe Burst', location: 'Ward A, Main Sq', description: 'Major pipe burst near market', status: 'In Progress', createdAt: new Date().toISOString(), userId: 'demo_user', userEmail: 'citizen@demo.com' },
+        { _id: '2', id: '2', type: 'Water Logging', location: 'Ward B, Lane 4', description: 'Stagnant water since yesterday', status: 'Open', createdAt: new Date(Date.now() - 86400000).toISOString(), userId: 'demo_user', userEmail: 'citizen@demo.com' },
+        { _id: '3', id: '3', type: 'System Alert', location: 'System', description: 'Sensor malfunction in Sector 4', status: 'Open', createdAt: new Date().toISOString(), userId: 'admin', userEmail: 'admin@system.com' },
+    ];
+
     const [complaints, setComplaints] = useState<Complaint[]>([]);
 
     // Demo Mode State
@@ -98,7 +106,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const interval = setInterval(() => {
             setWaterData(prev => ({
-                level: +(prev.level + (Math.random() * 0.2 - 0.1)).toFixed(2),
+                level: +(prev.level + (Math.random() * 0.2 - 0.1)).toFixed(1),
                 ph: +(prev.ph + (Math.random() * 0.1 - 0.05)).toFixed(1),
                 turbidity: +(prev.turbidity + (Math.random() * 0.2 - 0.1)).toFixed(1),
             }));
@@ -118,13 +126,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setToasts(prev => prev.filter(t => t.id !== id));
     };
 
-    // MongoDB Polling for Complaints
+    // Fetch Complaints (with Demo Fallback)
     const fetchComplaints = async () => {
         try {
             const res = await fetch('/api/complaints');
+            if (!res.ok) throw new Error("API Failed");
             const data = await res.json();
             if (data.success) {
-                // Map _id to id for frontend compatibility
                 const mappedComplaints = data.data.map((c: any) => ({
                     ...c,
                     id: c._id
@@ -134,14 +142,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 setComplaints(mappedComplaints);
             }
         } catch (error) {
-            console.error("Failed to fetch complaints:", error);
+            console.warn("API unavailable, using demo data:", error);
+            if (complaints.length === 0) setComplaints(DEMO_COMPLAINTS);
         }
     };
 
     // Initial fetch and polling
     useEffect(() => {
         fetchComplaints();
-        const interval = setInterval(fetchComplaints, 3000); // Poll every 3 seconds
+        const interval = setInterval(fetchComplaints, 5000); // Live sync
         return () => clearInterval(interval);
     }, []);
 
