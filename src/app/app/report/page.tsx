@@ -83,8 +83,9 @@ export default function ReportPage() {
 
                         {/* Type Selection */}
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Complaint Type</label>
+                            <label htmlFor="complaint-type" className={styles.label}>Complaint Type</label>
                             <select
+                                id="complaint-type"
                                 className={styles.select}
                                 value={formData.type}
                                 onChange={e => setFormData({ ...formData, type: e.target.value })}
@@ -101,10 +102,11 @@ export default function ReportPage() {
 
                         {/* Location Input */}
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Incident Location</label>
+                            <label htmlFor="incident-location" className={styles.label}>Incident Location</label>
                             <div className={styles.locationRow}>
                                 <div style={{ flex: 1 }}>
                                     <Input
+                                        id="incident-location"
                                         placeholder="Enter street address or landmark"
                                         value={formData.location}
                                         onChange={e => setFormData({ ...formData, location: e.target.value })}
@@ -118,7 +120,12 @@ export default function ReportPage() {
                             {/* Map Preview */}
                             <div className={styles.mapPreview}>
                                 <div className="w-full h-full">
-                                    <MapComponent waterLevel={14} />
+                                    <MapComponent
+                                        waterLevel={14}
+                                        onLocationSelect={(lat, lng) => {
+                                            setFormData(prev => ({ ...prev, location: `${lat.toFixed(4)}, ${lng.toFixed(4)}` }));
+                                        }}
+                                    />
                                 </div>
                                 {/* Overlay instruction to capture attention if needed, but Map is interactive */}
                                 <div className={styles.mapLabel} style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'white', padding: '4px 12px', borderRadius: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', fontSize: '0.75rem', zIndex: 999 }}>Pin location on map</div>
@@ -127,8 +134,9 @@ export default function ReportPage() {
 
                         {/* Description */}
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Description</label>
+                            <label htmlFor="complaint-description" className={styles.label}>Description</label>
                             <textarea
+                                id="complaint-description"
                                 className={styles.textarea}
                                 placeholder="Describe the issue in detail (e.g. severity, duration, specific landmarks)..."
                                 value={formData.description}
@@ -139,8 +147,24 @@ export default function ReportPage() {
 
                         {/* File Upload */}
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Upload Evidence <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>(Optional)</span></label>
-                            <div className={styles.uploadBox}>
+                            <label htmlFor="evidence-upload" className={styles.label}>Upload Evidence <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>(Optional)</span></label>
+                            <input
+                                type="file"
+                                id="evidence-upload"
+                                className="hidden"
+                                accept="image/png, image/jpeg, image/gif, image/svg+xml"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        // Mock upload by just showing the name
+                                        alert(`File selected: ${e.target.files[0].name}`);
+                                    }
+                                }}
+                                style={{ display: 'none' }}
+                            />
+                            <div
+                                className={styles.uploadBox}
+                                onClick={() => document.getElementById('evidence-upload')?.click()}
+                            >
                                 <div className={styles.uploadIconCircle}>
                                     <CloudUpload size={20} />
                                 </div>
@@ -214,8 +238,8 @@ export default function ReportPage() {
                         <div className={styles.modalBody}>
                             <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
                                 <div className={`p-2 rounded-full ${trackingResult.status === 'Resolved' ? 'bg-green-100 text-green-600' :
-                                        trackingResult.status === 'In Progress' ? 'bg-blue-100 text-blue-600' :
-                                            'bg-amber-100 text-amber-600'
+                                    trackingResult.status === 'In Progress' ? 'bg-blue-100 text-blue-600' :
+                                        'bg-amber-100 text-amber-600'
                                     }`}>
                                     {trackingResult.status === 'Resolved' ? <CheckCircle size={24} /> : <AlertTriangle size={24} />}
                                 </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import styles from "./MapComponent.module.css";
@@ -77,7 +77,7 @@ const EVACUATION_CENTERS = [
     { id: 102, lat: 16.6900, lng: 74.2600, name: "Rajarampuri Hall", capacity: 300 },
 ];
 
-export default function MapComponent({ waterLevel = 12 }: { waterLevel?: number }) {
+export default function MapComponent({ waterLevel = 12, onLocationSelect }: { waterLevel?: number, onLocationSelect?: (lat: number, lng: number) => void }) {
     const center: [number, number] = [16.7050, 74.2433]; // Kolhapur Coordinates
 
     // Dynamic Logic
@@ -121,6 +121,9 @@ export default function MapComponent({ waterLevel = 12 }: { waterLevel?: number 
                     radius={radius}
                 />
 
+                {/* Interactive Click Handler */}
+                <LocationMarker onLocationSelect={onLocationSelect} />
+
                 {/* Standard Markers */}
                 {MARKERS.map((marker) => (
                     <Marker
@@ -163,5 +166,26 @@ export default function MapComponent({ waterLevel = 12 }: { waterLevel?: number 
                 ))}
             </MapContainer>
         </div>
+    );
+}
+
+
+// Component to handle map clicks
+
+function LocationMarker({ onLocationSelect }: { onLocationSelect?: (lat: number, lng: number) => void }) {
+    const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
+    const map = useMapEvents({
+        click(e) {
+            setPosition(e.latlng);
+            if (onLocationSelect) {
+                onLocationSelect(e.latlng.lat, e.latlng.lng);
+            }
+        },
+    });
+
+    return position === null ? null : (
+        <Marker position={position} icon={DefaultIcon}>
+            <Popup>Selected Location: {position.lat.toFixed(4)}, {position.lng.toFixed(4)}</Popup>
+        </Marker>
     );
 }
