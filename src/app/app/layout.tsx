@@ -67,7 +67,7 @@ export default function AppLayout({
                             Kolhapur City
                         </div>
 
-                        <button className="flex items-center gap-2 bg-blue-600 text-white rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors">
+                        <button className="flex items-center gap-2 bg-blue-100 text-blue-700 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-200 transition-colors">
                             <Info size={16} />
                             Ward C: Safe Levels
                         </button>
