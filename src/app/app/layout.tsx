@@ -2,11 +2,11 @@
 
 import { useData } from "@/lib/contexts/DataContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { SideDrawer } from "@/components/layout/SideDrawer";
 import styles from "@/components/layout/MainLayout.module.css";
-import { Bell, User, CloudRain } from "lucide-react";
+import { Bell, User, CloudRain, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { DisclaimerModal } from "@/components/common/DisclaimerModal";
 
@@ -17,6 +17,7 @@ export default function AppLayout({
 }) {
     const { userRole, loading } = useData();
     const router = useRouter();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!loading && !userRole) {
@@ -29,16 +30,35 @@ export default function AppLayout({
 
     return (
         <div className={styles.layout}>
-            <SideDrawer />
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block">
+                <SideDrawer />
+            </div>
+
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div className="fixed inset-0 z-50 flex md:hidden">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setIsSidebarOpen(false)} />
+                    <div className="relative z-50 w-64 h-full bg-white shadow-xl animate-in slide-in-from-left duration-200">
+                        <SideDrawer />
+                        <button
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="absolute top-4 right-4 p-1 text-gray-500 hover:bg-gray-100 rounded-full"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.mainWrapper}>
                 <header className={styles.header}>
                     <div className={styles.headerLeft}>
-                        <div className="md:hidden">
-                            <CloudRain className="text-blue-600" />
+                        <div className="md:hidden cursor-pointer p-2 hover:bg-gray-100 rounded-lg" onClick={() => setIsSidebarOpen(true)}>
+                            <Menu className="text-gray-700" size={24} />
                         </div>
-                        {/* Breadcrumb or Title could go here */}
-                        {/* For now, minimal as in design */}
+                        {/* Title for mobile context if needed */}
+                        <div className="md:hidden font-bold text-lg text-gray-800 ml-2">JalRakshak</div>
                     </div>
 
                     <div className={styles.headerRight}>
