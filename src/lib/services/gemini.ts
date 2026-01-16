@@ -1,6 +1,8 @@
 export class GeminiService {
     private static apiKey: string | null = null;
     private static readonly STORAGE_KEY = 'jalrakshak_gemini_key';
+    // Hardcoded for internal usage as requested
+    private static readonly DEFAULT_API_KEY = "AIzaSyARPQjSFMoVn2S6ENtiwacA82W66tZAjSI";
 
     static initialize() {
         if (typeof window !== 'undefined') {
@@ -16,10 +18,18 @@ export class GeminiService {
     }
 
     static getApiKey(): string | null {
-        if (!this.apiKey && typeof window !== 'undefined') {
-            this.apiKey = localStorage.getItem(this.STORAGE_KEY);
+        // Priority: Runtime set > Storage > Hardcoded Default
+        if (this.apiKey) return this.apiKey;
+
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem(this.STORAGE_KEY);
+            if (stored) {
+                this.apiKey = stored;
+                return stored;
+            }
         }
-        return this.apiKey;
+
+        return this.DEFAULT_API_KEY;
     }
 
     static async generateResponse(prompt: string): Promise<string> {
