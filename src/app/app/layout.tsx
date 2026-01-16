@@ -15,15 +15,16 @@ export default function AppLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { userRole } = useData();
+    const { userRole, loading } = useData();
     const router = useRouter();
 
     useEffect(() => {
-        if (!userRole) {
+        if (!loading && !userRole) {
             router.push("/login"); // Auth Check
         }
-    }, [userRole, router]);
+    }, [userRole, loading, router]);
 
+    if (loading) return <div className="h-screen flex items-center justify-center text-blue-600 font-medium animate-pulse">Initializing App...</div>;
     if (!userRole) return null;
 
     return (
