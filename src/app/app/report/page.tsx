@@ -5,21 +5,58 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useState } from "react";
-import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X } from "lucide-react";
+import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X, CheckCircle } from "lucide-react";
 import styles from "./Report.module.css";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+
+// Dynamic Import for Map
+const MapComponent = dynamic(() => import("@/components/map/MapComponent"), {
+    ssr: false,
+    loading: () => <div className="flex items-center justify-center h-full bg-slate-100 text-slate-400 text-sm">Loading Map...</div>
+});
 
 export default function ReportPage() {
     const { userRole, complaints, addComplaint, updateComplaintStatus } = useData();
+    const router = useRouter();
+
+    // Form State
     const [formData, setFormData] = useState({
         type: "",
         location: "",
         description: "",
     });
 
+    // Tracking State
+    const [trackId, setTrackId] = useState("");
+    const [trackingResult, setTrackingResult] = useState<any | null>(null);
+    const [showTrackModal, setShowTrackModal] = useState(false);
+    const [trackError, setTrackError] = useState("");
+
     // ADMIN VIEW REDIRECT OR RENDER
     if (userRole === "admin") {
         return <AdminComplaintsView />;
     }
+
+    // Handlers
+    const handleTrackReport = () => {
+        if (!trackId.trim()) {
+            setTrackError("Please enter a valid Reference ID");
+            return;
+        }
+
+        // Search in complaints (including local state ones)
+        const found = complaints.find(c => c.id.toString() === trackId.trim() || c._id === trackId.trim());
+
+        if (found) {
+            setTrackingResult(found);
+            setShowTrackModal(true);
+            setTrackError("");
+        } else {
+            setTrackError("Report not found. Please check the ID.");
+            setTrackingResult(null);
+        }
+    };
 
     // CITIZEN VIEW
     return (
@@ -35,9 +72,13 @@ export default function ReportPage() {
                 <Card className={styles.formCard}>
                     <form className={styles.form} onSubmit={(e) => {
                         e.preventDefault();
+                        if (!formData.type || !formData.location || !formData.description) {
+                            alert("Please fill in all required fields.");
+                            return;
+                        }
                         addComplaint({ ...formData, type: formData.type as any || 'Other' });
                         setFormData({ type: "", location: "", description: "" });
-                        alert("Report submitted!");
+                        // Scroll to top or show success visual
                     }}>
 
                         {/* Type Selection */}
@@ -47,6 +88,7 @@ export default function ReportPage() {
                                 className={styles.select}
                                 value={formData.type}
                                 onChange={e => setFormData({ ...formData, type: e.target.value })}
+                                required
                             >
                                 <option value="" disabled>Select issue type</option>
                                 <option value="Pipe Burst">Pipe Burst</option>
@@ -66,16 +108,20 @@ export default function ReportPage() {
                                         placeholder="Enter street address or landmark"
                                         value={formData.location}
                                         onChange={e => setFormData({ ...formData, location: e.target.value })}
+                                        required
                                     />
                                 </div>
-                                <button type="button" className={styles.detectBtn}>
-                                    <MapPin size={18} style={{ marginRight: '0.5rem' }} /> Detect
+                                <button type="button" className={styles.detectBtn} onClick={() => setFormData({ ...formData, location: "Detected: Ward A, Near Shivaji Market" })}>
+                                    <MapPin size={18} style={{ marginRight: '0.5rem' }} /> Detect Location
                                 </button>
                             </div>
-                            {/* Map Preview Placeholder */}
+                            {/* Map Preview */}
                             <div className={styles.mapPreview}>
-                                <div className={styles.mapPattern}></div>
-                                <div className={styles.mapLabel}>Pin location on map</div>
+                                <div className="w-full h-full">
+                                    <MapComponent waterLevel={14} />
+                                </div>
+                                {/* Overlay instruction to capture attention if needed, but Map is interactive */}
+                                <div className={styles.mapLabel} style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'white', padding: '4px 12px', borderRadius: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', fontSize: '0.75rem', zIndex: 999 }}>Pin location on map</div>
                             </div>
                         </div>
 
@@ -87,6 +133,7 @@ export default function ReportPage() {
                                 placeholder="Describe the issue in detail (e.g. severity, duration, specific landmarks)..."
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                required
                             />
                         </div>
 
@@ -121,8 +168,18 @@ export default function ReportPage() {
                     </div>
                     <p className={styles.cardText}>Already filed a report? Enter your reference ID to track its progress.</p>
 
-                    <Input placeholder="e.g., JR-1234" style={{ marginBottom: '0.75rem' }} />
-                    <Button variant="outline" fullWidth>Track Report <ArrowRight size={16} style={{ marginLeft: '0.5rem' }} /></Button>
+                    <div className="relative mb-3">
+                        <Input
+                            placeholder="e.g., JR-1234"
+                            value={trackId}
+                            onChange={(e) => setTrackId(e.target.value)}
+                        />
+                    </div>
+                    {trackError && <p className="text-xs text-red-500 mb-2">{trackError}</p>}
+
+                    <Button variant="outline" fullWidth onClick={handleTrackReport}>
+                        Track Report <ArrowRight size={16} style={{ marginLeft: '0.5rem' }} />
+                    </Button>
 
                     <div className={styles.infoBox}>
                         <div className={styles.infoIcon}>i</div>
@@ -143,6 +200,55 @@ export default function ReportPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Tracking Modal */}
+            {showTrackModal && trackingResult && (
+                <div className={styles.modalOverlay} onClick={() => setShowTrackModal(false)}>
+                    <div className={styles.modal} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h3 className={styles.modalTitle}>Report Status #{trackingResult.id}</h3>
+                            <button className={styles.closeBtn} onClick={() => setShowTrackModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.modalBody}>
+                            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
+                                <div className={`p-2 rounded-full ${trackingResult.status === 'Resolved' ? 'bg-green-100 text-green-600' :
+                                        trackingResult.status === 'In Progress' ? 'bg-blue-100 text-blue-600' :
+                                            'bg-amber-100 text-amber-600'
+                                    }`}>
+                                    {trackingResult.status === 'Resolved' ? <CheckCircle size={24} /> : <AlertTriangle size={24} />}
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-slate-800">{trackingResult.status}</h4>
+                                    <p className="text-xs text-slate-500">Updated recently</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-500 uppercase">Type</label>
+                                    <p className="font-medium text-slate-800">{trackingResult.type}</p>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-500 uppercase">Description</label>
+                                    <p className="text-sm text-slate-600">{trackingResult.description}</p>
+                                </div>
+                                {trackingResult.adminResponse && (
+                                    <div className="bg-blue-50 border border-blue-100 p-3 rounded-md">
+                                        <label className="text-xs font-semibold text-blue-600 uppercase mb-1 block">Officer Response</label>
+                                        <p className="text-sm text-slate-700">{trackingResult.adminResponse}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className={styles.modalFooter}>
+                            <Button onClick={() => setShowTrackModal(false)}>Close</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

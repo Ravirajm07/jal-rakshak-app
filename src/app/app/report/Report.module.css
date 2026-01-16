@@ -92,7 +92,8 @@
 }
 
 .mapPreview {
-    height: 8rem;
+    height: 12rem;
+    /* Increased height for better map view */
     background-color: #f1f5f9;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
@@ -104,11 +105,13 @@
 }
 
 .mapPattern {
+    /* Hidden when map is loaded, but kept for fallback */
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-    background-size: 16px 16px;
-    opacity: 0.5;
+    pointer-events: none;
+    z-index: 10;
+    display: none;
+    /* Hide pattern by default as we will load map */
 }
 
 .mapLabel {
@@ -140,17 +143,20 @@
     border-color: var(--primary);
 }
 
+
 .uploadBox {
-    border: 2px dashed var(--border);
+    border: 2px dashed #94a3b8;
+    /* slate-400 */
     border-radius: var(--radius-lg);
-    padding: 2rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.2s;
+    background-color: #f8fafc;
+    transition: all 0.2s;
 }
 
 .uploadBox:hover {
@@ -234,7 +240,7 @@
 }
 
 .emergencyCard {
-    background-color: var(--danger-bg);
+    background-color: #fef2f2;
     border: 1px solid #fecaca;
     border-radius: var(--radius-lg);
     padding: 1.25rem;
