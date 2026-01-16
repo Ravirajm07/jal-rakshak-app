@@ -57,23 +57,26 @@ export default function AppLayout({
                         <div className="md:hidden cursor-pointer p-2 hover:bg-gray-100 rounded-lg" onClick={() => setIsSidebarOpen(true)}>
                             <Menu className="text-gray-700" size={24} />
                         </div>
-                        {/* Title for mobile context if needed */}
-                        <div className="md:hidden font-bold text-lg text-gray-800 ml-2">JalRakshak</div>
+
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+                            <span className="font-semibold text-slate-700">Kolhapur City</span>
+                        </div>
                     </div>
 
                     <div className={styles.headerRight}>
-                        <div className="flex bg-slate-100 rounded-full px-4 py-2 text-sm font-medium text-slate-600 items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            Kolhapur City
+                        <div className="hidden md:flex bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 text-sm font-semibold text-blue-700 items-center gap-2">
+                            <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">i</div>
+                            Ward C: Safe Levels
                         </div>
 
-                        <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-blue-600">
+                        <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-slate-600">
                             <Bell size={20} />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
                         </Button>
 
-                        <div className={styles.userProfile}>
-                            <User size={20} />
+                        <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center border border-blue-200">
+                            <User size={18} />
                         </div>
                     </div>
                 </header>
