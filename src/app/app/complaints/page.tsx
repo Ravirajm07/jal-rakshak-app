@@ -61,43 +61,42 @@ export default function ComplaintsPage() {
         <div className="p-6 md:p-8 space-y-6 max-w-[1400px] mx-auto font-inter bg-[#F8F9FA] min-h-screen">
 
             {/* 1. Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-1">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Complaint Management</h1>
-                    <div className="flex items-center gap-2 text-gray-500 mt-1">
-                        <RefreshCw size={14} />
-                        <p className="text-xs md:text-sm font-medium">Last updated: Just now</p>
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-[#111827] tracking-tight">Complaint Management</h1>
+                    <div className="flex items-center gap-2 text-gray-500 mt-1.5 ml-0.5">
+                        <RefreshCw size={14} className="text-gray-400" />
+                        <p className="text-xs md:text-sm font-medium text-gray-500">Last updated: Just now</p>
                     </div>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all">
+                <Button className="bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all h-10">
                     <Download size={18} />
                     Export Data
                 </Button>
             </div>
 
-            {/* 2. Filter Bar - Strict Alignment */}
-            <div className="bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-2 items-center">
-                {/* Search - Padded to match table */}
-                <div className="relative flex-1 w-full md:max-w-md">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            {/* 2. Filter Bar - High Fidelity Match */}
+            <div className="bg-white p-1 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center h-auto md:h-12 w-full">
+                {/* Search */}
+                <div className="relative flex-1 w-full h-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
                         placeholder="Search by ID or Location"
-                        className="w-full pl-12 pr-4 py-2.5 bg-transparent rounded-lg outline-none text-sm text-gray-700 placeholder:text-gray-400"
+                        className="w-full h-full pl-10 pr-4 py-2.5 md:py-0 bg-transparent rounded-lg outline-none text-sm text-gray-600 placeholder:text-gray-400"
                         value={searchTerm}
                         onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                     />
                 </div>
 
-                {/* Spacer */}
-                <div className="flex-1 hidden md:block"></div>
+                {/* Filters */}
+                <div className="flex items-center gap-6 px-4 border-t md:border-t-0 md:border-l border-gray-100 py-2 md:py-0 w-full md:w-auto h-full justify-end bg-gray-50 md:bg-transparent rounded-b-xl md:rounded-none">
 
-                {/* Filters Right Aligned */}
-                <div className="flex items-center gap-4 px-4 w-full md:w-auto overflow-x-auto border-t md:border-t-0 md:border-l border-gray-100 py-2 md:py-0">
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">Type:</span>
+                    {/* Type Filter */}
+                    <div className="relative flex items-center group cursor-pointer">
+                        <span className="text-sm font-semibold text-gray-700 mr-2">Type:</span>
                         <select
-                            className="appearance-none bg-transparent font-medium text-sm text-gray-900 outline-none cursor-pointer pr-6 py-1"
+                            className="appearance-none bg-transparent font-medium text-sm text-gray-500 outline-none cursor-pointer pr-4 hover:text-gray-900 transition-colors"
                             value={typeFilter}
                             onChange={(e) => { setTypeFilter(e.target.value); setCurrentPage(1); }}
                         >
@@ -108,10 +107,11 @@ export default function ComplaintsPage() {
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">Status:</span>
+                    {/* Status Filter */}
+                    <div className="relative flex items-center group cursor-pointer">
+                        <span className="text-sm font-semibold text-gray-700 mr-2">Status:</span>
                         <select
-                            className="appearance-none bg-transparent font-medium text-sm text-gray-900 outline-none cursor-pointer pr-6 py-1"
+                            className="appearance-none bg-transparent font-medium text-sm text-gray-500 outline-none cursor-pointer pr-4 hover:text-gray-900 transition-colors"
                             value={statusFilter}
                             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                         >
@@ -124,7 +124,7 @@ export default function ComplaintsPage() {
 
                     <button
                         onClick={() => { setSearchTerm(""); setStatusFilter("All"); setTypeFilter("All"); setCurrentPage(1); }}
-                        className="text-blue-600 hover:text-blue-700 text-sm font-semibold whitespace-nowrap ml-2"
+                        className="text-[#2563EB] hover:text-blue-800 text-sm font-semibold whitespace-nowrap"
                     >
                         Reset Filters
                     </button>
