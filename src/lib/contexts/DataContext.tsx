@@ -3,23 +3,12 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import {
     onAuthStateChanged,
-    signInWithEmailAndPassword,
     signOut,
     User
 } from "firebase/auth";
-import { auth, db } from "@/lib/firebase"; // Import db here
+import { auth } from "@/lib/firebase"; // Only import auth
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/ui/Toast";
-import {
-    collection,
-    addDoc,
-    updateDoc,
-    doc,
-    onSnapshot,
-    query,
-    orderBy,
-    serverTimestamp
-} from "firebase/firestore";
 
 // Define Types
 type UserRole = "citizen" | "admin" | null;
@@ -37,26 +26,27 @@ interface Alert {
     timestamp: string;
 }
 
-interface Complaint {
-    id: string; // Changed from number to string for Firestore ID
+export interface Complaint {
+    _id: string; // MongoDB ID
     type: "Pipe Burst" | "Water Logging" | "Sewage Leak" | "Quality Issue" | "Other";
     location: string;
     status: "Open" | "In Progress" | "Resolved";
     description?: string;
     adminResponse?: string;
-    timestamp?: any; // Firestore Timestamp
+    createdAt?: string;
     userId?: string;
+    userEmail?: string;
 }
 
 interface DataContextType {
     userRole: UserRole;
-    user: User | null; // Firebase User
+    user: User | null;
     waterData: WaterData;
     alerts: Alert[];
     complaints: Complaint[];
-    login: (role: UserRole) => Promise<void>; // Kept for interface compatibility, but unused
+    login: (role: UserRole) => Promise<void>;
     logout: () => Promise<void>;
-    addComplaint: (complaint: Omit<Complaint, "id" | "status" | "timestamp">) => Promise<void>;
+    addComplaint: (complaint: Omit<Complaint, "_id" | "status" | "createdAt">) => Promise<void>;
     updateComplaintStatus: (id: string, status: Complaint["status"], adminResponse?: string) => Promise<void>;
     loading: boolean;
 }
@@ -82,8 +72,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             if (currentUser) {
-                // Determine role based on email for demo purposes
-                // Real apps would use Custom Claims or Firestore
                 const role = currentUser.email?.includes("admin") ? "admin" : "citizen";
                 setUserRole(role);
             } else {
@@ -107,12 +95,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return () => clearInterval(interval);
     }, []);
 
-    // Firestore Collections
-    // Firestore Collections - Imports moved to top
-
     // Toast State
     const [toasts, setToasts] = useState<any[]>([]);
-    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
         const id = Math.random().toString(36).substr(2, 9);
@@ -123,44 +107,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setToasts(prev => prev.filter(t => t.id !== id));
     };
 
-    // Real-time Complaints Listener with Notifications
-    useEffect(() => {
-        const q = query(collection(db, "complaints"), orderBy("timestamp", "desc"));
-        const unsubscribe = onSnapshot(q, (snapshot: any) => {
-            const fetchedComplaints = snapshot.docs.map((doc: any) => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Complaint[];
-
-            setComplaints(fetchedComplaints);
-
-            // Handle Notifications
-            if (!isFirstLoad) {
-                snapshot.docChanges().forEach((change: any) => {
-                    const docData = change.doc.data();
-                    // New Complaint (Notify Admin)
-                    if (change.type === "added" && userRole === "admin" && docData.userId !== user?.uid) {
-                        showToast(`New ${docData.type} reported at ${docData.location}`, "info");
-                    }
-                    // Status Update (Notify Citizen)
-                    if (change.type === "modified") {
-                        // If user is owner
-                        if (userRole === "citizen" && docData.userId === user?.uid) {
-                            showToast(`Your complaint status updated to: ${docData.status}`, "success");
-                        }
-                        // If admin just updated it
-                        if (userRole === "admin") {
-                            // Optional confirmation for admin
-                        }
-                    }
-                });
-            } else {
-                setIsFirstLoad(false);
+    // MongoDB Polling for Complaints
+    const fetchComplaints = async () => {
+        try {
+            const res = await fetch('/api/complaints');
+            const data = await res.json();
+            if (data.success) {
+                setComplaints(data.data);
             }
-        });
+        } catch (error) {
+            console.error("Failed to fetch complaints:", error);
+        }
+    };
 
-        return () => unsubscribe();
-    }, [userRole, user, isFirstLoad]); // Dependencies updated
+    // Initial fetch and polling
+    useEffect(() => {
+        fetchComplaints();
+        const interval = setInterval(fetchComplaints, 3000); // Poll every 3 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     // Actions
     const login = async (role: UserRole) => {
@@ -176,16 +141,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const addComplaint = async (complaint: Omit<Complaint, "id" | "status" | "timestamp">) => {
+    const addComplaint = async (complaint: Omit<Complaint, "_id" | "status" | "createdAt">) => {
         try {
-            await addDoc(collection(db, "complaints"), {
-                ...complaint,
-                status: "Open",
-                timestamp: serverTimestamp(), // Server-side timestamp
-                userId: user?.uid || "anonymous",
-                userEmail: user?.email || "anonymous"
+            const res = await fetch('/api/complaints', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...complaint,
+                    userId: user?.uid || "anonymous",
+                    userEmail: user?.email || "anonymous"
+                })
             });
-            showToast("Complaint submitted successfully!", "success");
+            const data = await res.json();
+
+            if (data.success) {
+                showToast("Complaint submitted successfully!", "success");
+                fetchComplaints(); // Refresh immediately
+            } else {
+                throw new Error(data.error);
+            }
         } catch (e) {
             console.error("Error adding document: ", e);
             showToast("Failed to submit complaint.", "error");
@@ -194,13 +168,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     const updateComplaintStatus = async (id: string, status: Complaint["status"], adminResponse?: string) => {
         try {
-            const compRef = doc(db, "complaints", id);
-            await updateDoc(compRef, {
-                status,
-                adminResponse,
-                lastUpdated: serverTimestamp()
+            const res = await fetch(`/api/complaints/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status, adminResponse })
             });
-            showToast("Status updated!", "success");
+            const data = await res.json();
+
+            if (data.success) {
+                showToast("Status updated!", "success");
+                fetchComplaints(); // Refresh
+            } else {
+                throw new Error(data.error);
+            }
         } catch (e) {
             console.error("Error updating status: ", e);
             showToast("Failed to update status.", "error");

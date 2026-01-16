@@ -37,7 +37,7 @@
 | **Maps** | [Leaflet](https://leafletjs.com/) + OpenStreetMap |
 | **Charts** | [Recharts](https://recharts.org/) |
 | **AI** | [Google Gemini API](https://ai.google.dev/) |
-| **Database** | [Google Firestore](https://firebase.google.com/products/firestore) (NoSQL) |
+
 | **Mobile** | [Capacitor](https://capacitorjs.com/) (Android) |
 
 
