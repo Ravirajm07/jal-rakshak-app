@@ -14,7 +14,7 @@ export const SideDrawer = () => {
 
     // Default to citizen view if role isn't loaded yet to be safe, or wait? 
     // DataContext loads fast, usually 'citizen' or 'admin'.
-
+    // Force refresh check
     return (
         <aside className={styles.drawer}>
             <div className={styles.brand}>
