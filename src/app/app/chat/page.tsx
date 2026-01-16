@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import styles from "./Chat.module.css";
+import { useData } from "@/lib/contexts/DataContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Send, Bot, User } from "lucide-react";
@@ -18,9 +19,30 @@ export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([
         { id: 1, text: "Hello! I am your Smart JalRakshak Assistant powered by Google Gemini. Ask me about flood risks or water safety!", sender: "bot" }
     ]);
+    const { userRole } = useData();
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [showMenu, setShowMenu] = useState(true);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
-    const scrollRef = useRef<HTMLDivElement>(null);
+
+    const CHAT_MENUS = {
+        citizen: [
+            { label: "🌊 Flood Risk", query: "Is my area at flood risk today?" },
+            { label: "📍 River Status", query: "Current river water level status" },
+            { label: "🧪 Water Safety", query: "Is the water safe to drink?" },
+            { label: "🚨 Alerts", query: "Any active alerts in my ward?" },
+            { label: "📢 Help", query: "How do I raise a complaint?" },
+        ],
+        admin: [
+            { label: "📊 Rising Levels", query: "Show wards with rising water levels" },
+            { label: "🚧 Unresolved", query: "List unresolved complaints" },
+            { label: "🚨 Critical Alerts", query: "Any critical alerts in the last 24 hours?" },
+            { label: "🧪 Quality Trends", query: "Water quality anomalies this week" },
+            { label: "⚙️ System", query: "System health status" }
+        ]
+    };
+
+    const currentMenu = userRole === 'admin' ? CHAT_MENUS.admin : CHAT_MENUS.citizen;
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -28,21 +50,20 @@ export default function ChatPage() {
         }
     }, [messages, isTyping]);
 
-    const handleSend = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!input.trim()) return;
+    const sendMessage = async (text: string) => {
+        if (!text.trim()) return;
 
-        const userText = input;
-        const newMsg: Message = { id: Date.now(), text: userText, sender: "user" };
-
+        const newMsg: Message = { id: Date.now(), text: text, sender: "user" };
         setMessages(prev => [...prev, newMsg]);
         setInput("");
         setIsTyping(true);
+        setShowMenu(false); // Auto-hide menu on interaction layout if preferred, or keep it? explicit requirements say "Queries should collapse or scroll after interaction"
+
+        // Smooth scroll to bottom
+        setTimeout(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }), 100);
 
         try {
-            // Call Gemini Service
-            const response = await GeminiService.generateResponse(userText);
-
+            const response = await GeminiService.generateResponse(text);
             const botMsg: Message = {
                 id: Date.now() + 1,
                 text: response,
@@ -54,6 +75,11 @@ export default function ChatPage() {
         } finally {
             setIsTyping(false);
         }
+    };
+
+    const handleSend = (e: React.FormEvent) => {
+        e.preventDefault();
+        sendMessage(input);
     };
 
     return (
@@ -77,7 +103,6 @@ export default function ChatPage() {
                             {msg.sender === 'user' ? <User size={14} /> : <Bot size={14} />}
                         </div>
                         <div className={cn(styles.bubble, msg.sender === 'user' ? styles.user : styles.bot)}>
-                            {/* Simple Markdown parsing for simulation bolding */}
                             <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }}></p>
                         </div>
                     </div>
@@ -97,12 +122,25 @@ export default function ChatPage() {
                 )}
             </div>
 
+            {/* Quick Actions Menu */}
+            <div className="px-4 py-2 bg-gray-50 border-t border-gray-100 overflow-x-auto whitespace-nowrap flex gap-2 scrollbar-hide">
+                {currentMenu.map((item, index) => (
+                    <button
+                        key={index}
+                        onClick={() => sendMessage(item.query)}
+                        className="inline-flex items-center px-4 py-2 rounded-full bg-white border border-blue-100 text-blue-700 text-sm font-medium hover:bg-blue-50 hover:border-blue-200 transition-colors shadow-sm active:scale-95"
+                    >
+                        {item.label}
+                    </button>
+                ))}
+            </div>
+
             <form onSubmit={handleSend} className={styles.inputForm}>
                 <Input
                     placeholder="Ask Gemini about flood levels..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    style={{ borderRadius: '999px' }} // Quick inline override for pill shape
+                    style={{ borderRadius: '999px' }}
                 />
                 <Button type="submit" size="icon" className={styles.sendButton}>
                     <Send size={18} />
