@@ -209,7 +209,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
         } catch (e) {
             console.error("Error adding document: ", e);
-            showToast("Failed to submit complaint.", "error");
+            if (isApiFallback || isDemoMode) {
+                // Demo Mode Fallback
+                const newComplaint: Complaint = {
+                    _id: Math.random().toString(36).substr(2, 9),
+                    id: Math.random().toString(36).substr(2, 9),
+                    type: complaint.type,
+                    location: complaint.location,
+                    description: complaint.description,
+                    status: 'Open',
+                    createdAt: new Date().toISOString(),
+                    userId: user?.uid || "demo_user",
+                    userEmail: user?.email || "citizen@demo.com"
+                };
+                setComplaints(prev => [newComplaint, ...prev]);
+                showToast("Complaint submitted (Demo Mode)", "success");
+            } else {
+                showToast("Failed to submit complaint.", "error");
+            }
         }
     };
 
@@ -230,7 +247,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }
         } catch (e) {
             console.error("Error updating status: ", e);
-            showToast("Failed to update status.", "error");
+            if (isApiFallback || isDemoMode) {
+                // Demo Mode Fallback
+                setComplaints(prev => prev.map(c =>
+                    (c.id === id || c._id === id) ? { ...c, status, adminResponse: adminResponse || c.adminResponse } : c
+                ));
+                showToast("Status updated (Demo Mode)", "success");
+            } else {
+                showToast("Failed to update status.", "error");
+            }
         }
     };
 
