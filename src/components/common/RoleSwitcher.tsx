@@ -1,6 +1,6 @@
 import { useData } from "@/lib/contexts/DataContext";
 import { Button } from "@/components/ui/Button";
-import { User, Shield, toggle } from "lucide-react";
+import { User, Shield } from "lucide-react";
 
 export function RoleSwitcher() {
     const { isDemoMode, toggleDemoMode, userRole, setDemoRole } = useData();
@@ -35,8 +35,8 @@ export function RoleSwitcher() {
                 <button
                     onClick={() => setDemoRole("citizen")}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-sm transition-all ${userRole === "citizen"
-                            ? "bg-white text-blue-600 shadow-sm"
-                            : "text-gray-500 hover:text-gray-700"
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     <User size={16} />
@@ -45,8 +45,8 @@ export function RoleSwitcher() {
                 <button
                     onClick={() => setDemoRole("admin")}
                     className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-sm transition-all ${userRole === "admin"
-                            ? "bg-white text-indigo-600 shadow-sm"
-                            : "text-gray-500 hover:text-gray-700"
+                        ? "bg-white text-indigo-600 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     <Shield size={16} />
