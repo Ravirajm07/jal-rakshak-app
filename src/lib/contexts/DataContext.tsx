@@ -157,12 +157,36 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     // Initial fetch and polling
     useEffect(() => {
+        // 1. Try to load from LocalStorage FIRST for instant render
+        const saved = localStorage.getItem('demo_complaints');
+        if (saved) {
+            try {
+                setComplaints(JSON.parse(saved));
+                setLoading(false); // Instant load!
+            } catch (e) {
+                console.error("Failed to parse local complaints", e);
+            }
+        } else {
+            // Seed with Demo Data if nothing in LS
+            setComplaints(DEMO_COMPLAINTS);
+            setLoading(false);
+        }
+
+        // 2. Then sync with Server (Background)
         fetchComplaints();
+
         const interval = setInterval(() => {
             if (!isApiFallback) fetchComplaints();
         }, 5000); // Live sync
         return () => clearInterval(interval);
     }, [isApiFallback]);
+
+    // Save to LS whenever complaints change (to persist across refresh)
+    useEffect(() => {
+        if (complaints.length > 0) {
+            localStorage.setItem('demo_complaints', JSON.stringify(complaints));
+        }
+    }, [complaints]);
 
     // Actions
     const login = async (role: UserRole) => {
