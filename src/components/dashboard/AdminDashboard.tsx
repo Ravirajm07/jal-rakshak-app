@@ -189,6 +189,43 @@ export function AdminDashboard() {
 
                 {/* Right: Quality Indicators column */}
                 <div className={styles.rightColumn}>
+                    {/* Recent Reports Feed - LIVE */}
+                    <Card className={styles.statusSummary} style={{ backgroundColor: '#fff', border: '1px solid var(--border)', padding: '1rem' }}>
+                        <div className={styles.statusHeader} style={{ marginBottom: '1rem' }}>
+                            <h3 className={styles.statusTitle} style={{ color: '#0f172a' }}>Recent Citizen Reports</h3>
+                            <div className="animate-pulse flex items-center gap-1 text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">
+                                <span className="w-2 h-2 rounded-full bg-red-500"></span> LIVE
+                            </div>
+                        </div>
+
+                        <div className={styles.reportList}>
+                            {complaints.slice(0, 4).map((report) => (
+                                <div key={report._id} className={styles.reportItem}>
+                                    <div className={styles.reportIcon}>
+                                        <AlertTriangle size={16} />
+                                    </div>
+                                    <div className={styles.reportContent}>
+                                        <div className={styles.reportHeader}>
+                                            <div className={styles.reportType}>{report.type}</div>
+                                            <div className={styles.reportTime}>
+                                                {new Date(report.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                        <div className={styles.reportLoc}>
+                                            <Filter size={12} /> {report.location}
+                                        </div>
+                                        <div className={styles.reportStatus}>
+                                            {report.status}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {complaints.length === 0 && (
+                                <div className="text-center text-gray-400 text-sm py-4">No recent reports</div>
+                            )}
+                        </div>
+                    </Card>
+
                     {/* Overall Status */}
                     <Card className={styles.statusSummary}>
                         <div className={styles.statusHeader}>

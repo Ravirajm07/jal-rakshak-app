@@ -33,6 +33,10 @@ export async function POST(request: Request) {
         try {
             const body = await request.json();
             const mockComplaint = { ...body, _id: Math.random().toString(36).substr(2, 9), createdAt: new Date().toISOString() };
+
+            // Push to in-memory store so other devices (Admin) can see it!
+            DEMO_COMPLAINTS.unshift(mockComplaint);
+
             return NextResponse.json({ success: true, data: mockComplaint, _isDemo: true }, { status: 201 });
         } catch (e) {
             return NextResponse.json({ success: false, error: 'Failed to create complaint' }, { status: 400 });
