@@ -5,15 +5,23 @@ import { DemoStore } from '@/lib/demo-store';
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
+    let body;
+
+    try {
+        body = await request.json();
+    } catch (e) {
+        return NextResponse.json({ success: false, error: 'Invalid JSON' }, { status: 400 });
+    }
+
     try {
         await dbConnect();
-        const body = await request.json();
 
         // Try real DB first
         const complaint = await Complaint.findByIdAndUpdate(
-            params.id,
+            id,
             { ...body },
             { new: true }
         );
@@ -27,8 +35,8 @@ export async function PATCH(
         console.warn("Database connection failed or item not found, trying DEMO store");
 
         try {
-            const body = await request.json();
-            const updated = DemoStore.update(params.id, body);
+            // Use the already parsed body
+            const updated = DemoStore.update(id, body);
 
             if (updated) {
                 return NextResponse.json({ success: true, data: updated, _isDemo: true });
