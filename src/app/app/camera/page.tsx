@@ -135,8 +135,13 @@ export default function CameraPage() {
                                         alt={cam.location}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = 'none';
-                                            // You could show an error icon here
+                                            const img = e.target as HTMLImageElement;
+                                            img.style.display = 'none';
+                                            // Append a text error
+                                            img.parentElement!.innerHTML = `<div style="color: #ef4444; font-size: 0.75rem; text-align: center; padding: 1rem;">
+                                                <p style="font-weight: 700; margin-bottom: 0.25rem;">Connection Failed</p>
+                                                <p>Check IP or ensure Mixed Content is allowed.</p>
+                                            </div>`;
                                         }}
                                     />
                                 ) : (
@@ -203,21 +208,29 @@ export default function CameraPage() {
                                 />
                             </div>
                             <div className={styles.formGroup}>
-                                <label className={styles.label}>Camera IP Address</label>
+                                <label className={styles.label}>Camera IP Address or URL</label>
                                 <Input
                                     className={styles.input}
-                                    placeholder="e.g. 192.168.1.5"
+                                    placeholder="e.g. 192.168.29.45"
                                     value={newCam.ip}
                                     onChange={(e) => setNewCam({ ...newCam, ip: e.target.value })}
                                 />
                                 <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '0.5rem' }}>
-                                    Enter the IP shown in your IP Webcam app (e.g. <b>192.168.29.45</b>). <br />
-                                    We will automatically connect to port 8080/video.
+                                    <b>Tip:</b> If using &quot;IP Webcam&quot; app, just enter the IP (e.g. 192.168.1.5).
+                                    <br />
+                                    Constructed URL: <code style={{ background: '#eee', padding: '2px 4px', borderRadius: '4px' }}>{
+                                        !newCam.ip ? '...' :
+                                            newCam.ip.startsWith('http') ? newCam.ip : `http://${newCam.ip}:8080/video`
+                                    }</code>
                                 </p>
                             </div>
                         </div>
                         <div className={styles.modalFooter}>
                             <Button variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
+                            <Button variant="outline" onClick={() => {
+                                const url = !newCam.ip ? '' : newCam.ip.startsWith('http') ? newCam.ip : `http://${newCam.ip}:8080/video`;
+                                if (url) window.open(url, '_blank');
+                            }}>Test Link</Button>
                             <Button onClick={handleAddCamera}>Join & Show</Button>
                         </div>
                     </div>
