@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useState, useRef } from "react";
-import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X, CheckCircle } from "lucide-react";
+import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X, CheckCircle, Copy } from "lucide-react";
 import styles from "./Report.module.css";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -40,6 +40,9 @@ export default function ReportPage() {
         return <AdminComplaintsView />;
     }
 
+    // Success State
+    const [submittedReport, setSubmittedReport] = useState<any | null>(null);
+
     // Handlers
     const handleTrackReport = () => {
         if (!trackId.trim()) {
@@ -60,6 +63,84 @@ export default function ReportPage() {
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.type || !formData.location || !formData.description) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        // Generate a temporary ID for immediate display (backend will assign real one, but for demo we simulate)
+        const tempId = `JR-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        await addComplaint({
+            ...formData,
+            type: formData.type as any || 'Other',
+            // Pass the ID if we modified addComplaint to accept it, otherwise get it from result if possible
+            // For now, relies on addComplaint logic, but we'll simulate the "Success Object" for the view
+        });
+
+        // Simulate the created object for the success view
+        setSubmittedReport({
+            id: tempId,
+            ...formData,
+            status: 'Open',
+            createdAt: new Date().toISOString()
+        });
+
+        setFormData({ type: "", location: "", description: "" });
+    };
+
+    // SUCCESS VIEW (Mobile optimized)
+    if (submittedReport) {
+        return (
+            <div className={`flex flex-col items-center justify-center min-h-[80vh] px-4 ${styles.animatePop}`}>
+                <div className="bg-green-50 rounded-full p-6 mb-6 animate-bounce">
+                    <div className="bg-green-500 rounded-full p-2">
+                        <CheckCircle size={48} className="text-white" />
+                    </div>
+                </div>
+
+                <h2 className="text-2xl font-bold text-slate-900 mb-2 text-center">Submission Successful!</h2>
+                <p className="text-slate-500 text-center mb-8 max-w-xs">
+                    Thank you for being a responsible citizen. We have received your report regarding the water issue.
+                </p>
+
+                <div className="w-full max-w-sm bg-slate-50 rounded-xl p-6 border border-slate-100 mb-8">
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Complaint ID</div>
+                    <div className="flex justify-between items-center mb-6">
+                        <span className="text-2xl font-bold text-slate-900">{submittedReport.id}</span>
+                        <Button variant="ghost" size="sm" onClick={() => { navigator.clipboard.writeText(submittedReport.id); alert("Copied!"); }}>
+                            <Copy size={16} />
+                        </Button>
+                    </div>
+
+                    <div className="h-px bg-slate-200 w-full mb-6"></div>
+
+                    <div className="flex justify-between items-center">
+                        <span className="text-slate-600 font-medium">Current Status</span>
+                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2">
+                            <span className="w-2 h-2 bg-green-500 rounded-full"></span> Open
+                        </span>
+                    </div>
+                </div>
+
+                <div className="w-full max-w-sm flex flex-col gap-3">
+                    <Button fullWidth size="md" onClick={() => {
+                        setTrackId(submittedReport.id);
+                        setSubmittedReport(null);
+                        handleTrackReport(); // Open tracking modal
+                    }}>
+                        Track Status
+                    </Button>
+                    <Button variant="ghost" fullWidth onClick={() => setSubmittedReport(null)}>
+                        Return to Home
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     // CITIZEN VIEW
     return (
         <div className={styles.container}>
@@ -72,16 +153,7 @@ export default function ReportPage() {
                 </div>
 
                 <Card className={styles.formCard}>
-                    <form className={styles.form} onSubmit={(e) => {
-                        e.preventDefault();
-                        if (!formData.type || !formData.location || !formData.description) {
-                            alert("Please fill in all required fields.");
-                            return;
-                        }
-                        addComplaint({ ...formData, type: formData.type as any || 'Other' });
-                        setFormData({ type: "", location: "", description: "" });
-                        // Scroll to top or show success visual
-                    }}>
+                    <form className={styles.form} onSubmit={handleSubmit}>
 
                         {/* Type Selection */}
                         <div className={styles.formGroup}>

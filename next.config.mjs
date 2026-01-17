@@ -3,7 +3,7 @@ const nextConfig = {
     images: {
         unoptimized: true
     },
-    // Removed output: 'export' for API Routes support
+    output: 'export',
     async headers() {
         return [
             {
