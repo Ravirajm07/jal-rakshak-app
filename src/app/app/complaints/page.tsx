@@ -161,8 +161,7 @@ export default function ComplaintsPage() {
                             {paginatedItems.map((c, i) => (
                                 <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-5 font-bold text-gray-900 text-sm">
-                                        #JR-204{9 - i - (currentPage - 1) * 5}
-                                        {/* Mocking ID sequence to match image #JR-2049 descending */}
+                                        #{c.id}
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-3">
@@ -208,7 +207,7 @@ export default function ComplaintsPage() {
                 {/* Pagination */}
                 <div className="border-t border-gray-200 p-4 bg-white flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-sm text-gray-500 font-medium">
-                        Showing <span className="font-bold text-gray-900">{startIndex + 1}</span> to <span className="font-bold text-gray-900">{Math.min(startIndex + itemsPerPage, filteredComplaints.length)}</span> of <span className="font-bold text-gray-900">50</span> entries
+                        Showing <span className="font-bold text-gray-900">{startIndex + 1}</span> to <span className="font-bold text-gray-900">{Math.min(startIndex + itemsPerPage, filteredComplaints.length)}</span> of <span className="font-bold text-gray-900">{filteredComplaints.length}</span> entries
                     </p>
                     <div className="flex items-center gap-2">
                         <button

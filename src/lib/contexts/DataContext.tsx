@@ -9,6 +9,7 @@ import {
 import { auth } from "@/lib/firebase"; // Only import auth
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/ui/Toast";
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 // Define Types
 type UserRole = "citizen" | "admin" | null;
@@ -39,6 +40,15 @@ export interface Complaint {
     userEmail?: string;
 }
 
+export interface AppNotification {
+    id: string;
+    title: string;
+    message: string;
+    type: "success" | "warning" | "info" | "error";
+    read: boolean;
+    time: string;
+}
+
 interface DataContextType {
     userRole: UserRole;
     user: User | null;
@@ -47,12 +57,15 @@ interface DataContextType {
     complaints: Complaint[];
     login: (role: UserRole) => Promise<void>;
     logout: () => Promise<void>;
-    addComplaint: (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => Promise<void>;
+    addComplaint: (complaint: Omit<Complaint, "_id" | "status" | "createdAt"> & { id?: string }) => Promise<void>;
     updateComplaintStatus: (id: string, status: Complaint["status"], adminResponse?: string) => Promise<void>;
     loading: boolean;
     isDemoMode: boolean;
     toggleDemoMode: () => void;
     setDemoRole: (role: UserRole) => void;
+    notifications: AppNotification[];
+    markAsRead: (id: string) => void;
+    markAllAsRead: () => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -76,6 +89,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
         { _id: '2', id: '2', type: 'Water Logging', location: 'Ward B, Lane 4', description: 'Stagnant water since yesterday', status: 'Open', createdAt: new Date(Date.now() - 86400000).toISOString(), userId: 'demo_user', userEmail: 'citizen@demo.com' },
         { _id: '3', id: '3', type: 'System Alert', location: 'System', description: 'Sensor malfunction in Sector 4', status: 'Open', createdAt: new Date().toISOString(), userId: 'admin', userEmail: 'admin@system.com' },
     ];
+
+    // Notification State
+    const [notifications, setNotifications] = useState<AppNotification[]>([
+        { id: "101", title: "Welcome", message: "Welcome to JalRakshak! Report issues to help us.", type: "info", read: false, time: "Just now" }
+    ]);
 
     const [complaints, setComplaints] = useState<Complaint[]>([]);
 
@@ -234,7 +252,95 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (role) localStorage.setItem('user_role', role); // Persist manually set demo role
     };
 
-    const addComplaint = async (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => {
+    const addNotification = async (title: string, message: string, type: "success" | "warning" | "info" | "error" = "info") => {
+        const newNotif: AppNotification = {
+            id: Math.random().toString(36).substr(2, 9),
+            title,
+            message,
+            type,
+            read: false,
+            time: "Just now"
+        };
+        setNotifications(prev => [newNotif, ...prev]);
+
+        // Native Notification Trigger
+        try {
+            // Check if native environment
+            const isNative = typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform();
+            if (isNative) {
+                await LocalNotifications.schedule({
+                    notifications: [
+                        {
+                            title: title,
+                            body: message,
+                            id: Math.floor(Math.random() * 100000),
+                            schedule: { at: new Date(Date.now() + 100) }, // Immediate
+                            sound: undefined,
+                            attachments: undefined,
+                            actionTypeId: "",
+                            extra: null
+                        }
+                    ]
+                });
+            }
+        } catch (e) {
+            console.warn("Native notification failed:", e);
+        }
+    };
+
+    const markAsRead = (id: string) => {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    };
+
+    const markAllAsRead = () => {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    };
+
+    const updateComplaintStatus = async (id: string, status: Complaint["status"], adminResponse?: string) => {
+        try {
+            const res = await fetch(`/api/complaints/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status, adminResponse })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                showToast("Status updated!", "success");
+
+                // AUTO-NOTIFY Logic
+                addNotification(
+                    "Complaint Updated",
+                    `Your complaint #${id} is now ${status}. ${adminResponse ? `Note: ${adminResponse}` : ''}`,
+                    status === 'Resolved' ? 'success' : 'info'
+                );
+
+                fetchComplaints(); // Refresh
+            } else {
+                throw new Error(data.error);
+            }
+        } catch (e) {
+            console.error("Error updating status: ", e);
+            if (isApiFallback || isDemoMode) {
+                // Demo Mode Fallback
+                setComplaints(prev => prev.map(c =>
+                    (c.id === id || c._id === id) ? { ...c, status, adminResponse: adminResponse || c.adminResponse } : c
+                ));
+                showToast("Status updated (Demo Mode)", "success");
+
+                // Demo Notification
+                addNotification(
+                    "Complaint Updated",
+                    `Your complaint #${id} is now ${status}.`,
+                    status === 'Resolved' ? 'success' : 'info'
+                );
+            } else {
+                showToast("Failed to update status.", "error");
+            }
+        }
+    };
+
+    const addComplaint = async (complaint: Omit<Complaint, "_id" | "status" | "createdAt"> & { id?: string }) => {
         try {
             const res = await fetch('/api/complaints', {
                 method: 'POST',
@@ -249,6 +355,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             if (data.success) {
                 showToast("Complaint submitted successfully!", "success");
+                // Notify user
+                setTimeout(() => {
+                    addNotification("Report Received", "We have received your report. Thank you for alerting us.", "success");
+                }, 1000);
                 fetchComplaints(); // Refresh immediately
             } else {
                 throw new Error(data.error);
@@ -257,9 +367,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
             console.error("Error adding document: ", e);
             if (isApiFallback || isDemoMode) {
                 // Demo Mode Fallback
+                const fallbackId = Math.random().toString(36).substr(2, 9);
                 const newComplaint: Complaint = {
-                    _id: Math.random().toString(36).substr(2, 9),
-                    id: Math.random().toString(36).substr(2, 9),
+                    _id: complaint.id || fallbackId,
+                    id: complaint.id || fallbackId,
                     type: complaint.type,
                     location: complaint.location,
                     description: complaint.description,
@@ -270,37 +381,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 };
                 setComplaints(prev => [newComplaint, ...prev]);
                 showToast("Complaint submitted (Demo Mode)", "success");
+                // Notify user demo
+                setTimeout(() => {
+                    addNotification("Report Received", "We have received your report. Thank you for alerting us.", "success");
+                }, 1000);
             } else {
                 showToast("Failed to submit complaint.", "error");
-            }
-        }
-    };
-
-    const updateComplaintStatus = async (id: string, status: Complaint["status"], adminResponse?: string) => {
-        try {
-            const res = await fetch(`/api/complaints/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status, adminResponse })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                showToast("Status updated!", "success");
-                fetchComplaints(); // Refresh
-            } else {
-                throw new Error(data.error);
-            }
-        } catch (e) {
-            console.error("Error updating status: ", e);
-            if (isApiFallback || isDemoMode) {
-                // Demo Mode Fallback
-                setComplaints(prev => prev.map(c =>
-                    (c.id === id || c._id === id) ? { ...c, status, adminResponse: adminResponse || c.adminResponse } : c
-                ));
-                showToast("Status updated (Demo Mode)", "success");
-            } else {
-                showToast("Failed to update status.", "error");
             }
         }
     };
@@ -312,6 +398,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
             waterData,
             alerts,
             complaints,
+            notifications,
+            markAsRead,
+            markAllAsRead,
             login,
             logout,
             addComplaint,

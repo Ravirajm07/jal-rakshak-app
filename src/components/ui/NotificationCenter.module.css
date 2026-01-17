@@ -1,0 +1,14 @@
+/* NotificationCenter.module.css */
+/* Tailwind classes handle most styling, this is for specifics if needed */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+}

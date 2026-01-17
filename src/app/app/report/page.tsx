@@ -75,9 +75,8 @@ export default function ReportPage() {
 
         await addComplaint({
             ...formData,
+            id: tempId, // Pass the generated ID to be stored
             type: formData.type as any || 'Other',
-            // Pass the ID if we modified addComplaint to accept it, otherwise get it from result if possible
-            // For now, relies on addComplaint logic, but we'll simulate the "Success Object" for the view
         });
 
         // Simulate the created object for the success view

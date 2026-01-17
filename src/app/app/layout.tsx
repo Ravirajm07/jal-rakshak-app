@@ -1,6 +1,7 @@
 "use client";
 
 import { useData } from "@/lib/contexts/DataContext";
+import NotificationCenter from "@/components/ui/NotificationCenter";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BottomNav } from "@/components/layout/BottomNav";
