@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import styles from "./Camera.module.css";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Maximize2, VolumeX, AlertCircle, RefreshCw, Video, Activity, ShieldCheck, Plus, X } from "lucide-react";
+import { Maximize2, VolumeX, AlertCircle, RefreshCw, Video, Activity, ShieldCheck, Plus, X, Trash2 } from "lucide-react";
 
 interface CameraFeed {
     id: string;
@@ -181,6 +181,14 @@ export default function CameraPage() {
                             <div className={styles.controls}>
                                 <button className={styles.controlBtn} title="Mute"><VolumeX size={16} /></button>
                                 <button className={styles.controlBtn} title="Fullscreen"><Maximize2 size={16} /></button>
+                                <button
+                                    className={styles.controlBtn}
+                                    title="Remove Camera"
+                                    onClick={() => setCameras(prev => prev.filter(c => c.id !== cam.id))}
+                                    style={{ color: '#f87171' }}
+                                >
+                                    <Trash2 size={16} />
+                                </button>
                             </div>
                         </div>
                     </div>
