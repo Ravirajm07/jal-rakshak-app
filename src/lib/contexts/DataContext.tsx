@@ -85,13 +85,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     // Firebase Auth Listener
     useEffect(() => {
+        // Hydrate from LocalStorage first to prevent redirect on refresh
+        const savedRole = localStorage.getItem('user_role');
+        if (savedRole) {
+            setUserRole(savedRole as UserRole);
+            setLoading(false); // Valid role found, stop loading immediately
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             if (currentUser) {
                 const role = currentUser.email?.includes("admin") ? "admin" : "citizen";
                 setUserRole(role);
+                localStorage.setItem('user_role', role);
             } else {
-                setUserRole(null);
+                // Only clear if we are NOT in demo mode (manual demo mode persistence handles otherwise)
+                if (!localStorage.getItem('is_demo_mode')) {
+                    setUserRole(null);
+                    localStorage.removeItem('user_role');
+                }
             }
             setLoading(false);
         });
@@ -203,13 +215,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
     };
 
     const toggleDemoMode = () => {
-        setIsDemoMode(prev => !prev);
+        setIsDemoMode(prev => {
+            const newVal = !prev;
+            if (newVal) localStorage.setItem('is_demo_mode', 'true');
+            else localStorage.removeItem('is_demo_mode');
+            return newVal;
+        });
+
         // Default to citizen when entering demo mode
-        if (!isDemoMode) setDemoRole("citizen");
+        if (!isDemoMode) {
+            setDemoRole("citizen");
+            localStorage.setItem('user_role', "citizen"); // Persist effective role
+        }
     };
 
     const setDemoRoleAction = (role: UserRole) => {
         setDemoRole(role);
+        if (role) localStorage.setItem('user_role', role); // Persist manually set demo role
     };
 
     const addComplaint = async (complaint: Omit<Complaint, "_id" | "id" | "status" | "createdAt">) => {
