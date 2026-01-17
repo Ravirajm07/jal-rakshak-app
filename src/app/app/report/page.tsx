@@ -36,9 +36,9 @@ export default function ReportPage() {
     const [trackError, setTrackError] = useState("");
 
     // ADMIN VIEW - Allow admin to file reports too (Management removed as requested)
-    // if (userRole === "admin") {
-    //    return <AdminComplaintsView />;
-    // }
+    if (userRole === "admin") {
+        return <AdminComplaintsView />;
+    }
 
     // Handlers
     const handleTrackReport = () => {
