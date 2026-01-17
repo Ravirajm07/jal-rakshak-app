@@ -62,23 +62,27 @@ export default function AppLayout({
                     </div>
 
                     <div className={styles.headerRight}>
-                        <div className="flex bg-slate-100 rounded-full px-4 py-2 text-sm font-medium text-slate-600 items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        {/* Location Pill - Visible on mobile but compact */}
+                        <div className="hidden min-[380px]:flex bg-slate-100 rounded-full pl-3 pr-4 py-1.5 text-xs font-semibold text-slate-700 items-center gap-2 whitespace-nowrap shadow-sm border border-slate-200">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                             Kolhapur City
                         </div>
 
-                        <button className="flex items-center gap-2 bg-blue-100 text-blue-700 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-200 transition-colors">
-                            <Info size={16} />
-                            Ward C: Safe Levels
-                        </button>
+                        {/* Status Pill - Ward C */}
+                        <div className="hidden sm:flex bg-blue-50 text-blue-700 rounded-full px-3 py-1.5 text-xs font-semibold hover:bg-blue-100 transition-colors items-center gap-1.5 whitespace-nowrap shadow-sm border border-blue-100">
+                            <Info size={14} className="stroke-[2.5px]" />
+                            <span>Ward C: Safe</span>
+                        </div>
 
-                        <Button variant="ghost" size="icon" className="relative text-slate-500 hover:text-blue-600">
-                            <Bell size={20} />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                        {/* Bell Icon */}
+                        <Button variant="ghost" size="icon" className="relative text-slate-600 hover:bg-slate-100 w-9 h-9 rounded-full">
+                            <Bell size={20} strokeWidth={2.5} />
+                            <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                         </Button>
 
-                        <div className={styles.userProfile}>
-                            <User size={20} />
+                        {/* Profile Avatar - Outlined */}
+                        <div className="w-9 h-9 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 bg-white shadow-sm">
+                            <User size={20} strokeWidth={2.5} />
                         </div>
                     </div>
                 </header>

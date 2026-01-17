@@ -8,41 +8,43 @@ export default function ProfilePage() {
     const { userRole, complaints } = useData();
 
     return (
-        <div className="max-w-md mx-auto">
-            <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-slate-200 rounded-full mx-auto mb-3 flex items-center justify-center text-slate-400">
-                    <User size={40} />
+        <div className="max-w-md mx-auto space-y-4">
+            {/* Main Profile Card */}
+            <Card className="p-6 text-center border-none shadow-sm">
+                <div className="w-24 h-24 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center text-slate-400 border border-slate-200">
+                    <User size={48} strokeWidth={1.5} />
                 </div>
-                <h1 className="text-xl font-bold">Citizen User</h1>
-                <p className="text-slate-500 capitalize">{userRole} Account</p>
-            </div>
+                <h1 className="text-2xl font-bold text-slate-900">Citizen User</h1>
+                <p className="text-slate-500 font-medium mb-6">Admin Account</p>
 
-            <Card className="mb-6">
-                <h3 className="font-semibold mb-4 border-b pb-2">Personal Details</h3>
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-sm">
-                        <Phone size={16} className="text-slate-400" />
-                        <span>+91 98765 43210</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                        <MapPin size={16} className="text-slate-400" />
-                        <span>RajaramPuri, Kolhapur</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                        <Shield size={16} className="text-slate-400" />
-                        <span>ID Verified</span>
+                <div className="text-left pt-6 border-t border-slate-100">
+                    <h3 className="font-semibold text-slate-900 mb-4">Personal Details</h3>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-4 text-sm">
+                            <Phone size={18} className="text-slate-400" />
+                            <span className="font-medium text-slate-700">+91 98765 43210</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                            <MapPin size={18} className="text-slate-400" />
+                            <span className="font-medium text-slate-700">RajaramPuri, Kolhapur</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                            <Shield size={18} className="text-slate-400" />
+                            <span className="font-medium text-slate-700">ID Verified</span>
+                        </div>
                     </div>
                 </div>
             </Card>
 
+            {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
-                <Card className="text-center p-4">
-                    <div className="text-2xl font-bold text-blue-600">{complaints.length}</div>
-                    <div className="text-xs text-slate-500">Reports Filed</div>
+                <Card className="text-center p-6 border-none shadow-sm flex flex-col items-center justify-center min-h-[140px]">
+                    <div className="text-4xl font-bold text-blue-600 mb-1">{complaints.length}</div>
+                    <div className="text-sm font-medium text-slate-500">Reports Filed</div>
                 </Card>
-                <Card className="text-center p-4">
-                    <div className="text-2xl font-bold text-green-600">0</div>
-                    <div className="text-xs text-slate-500">Alerts Subscribed</div>
+                <Card className="text-center p-6 border-none shadow-sm flex flex-col items-center justify-center min-h-[140px]">
+                    <div className="text-4xl font-bold text-green-600 mb-1">0</div>
+                    <div className="text-sm font-medium text-slate-500">Alerts Subscribed</div>
                 </Card>
             </div>
         </div>
