@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/Ravirajm07/jal-rakshak-app/actions/workflows/ci.yml/badge.svg)](https://github.com/Ravirajm07/jal-rakshak-app/actions/workflows/ci.yml)
+[![Latest GitHub release](https://img.shields.io/github/v/release/Ravirajm07/jal-rakshak-app?sort=semver)](https://github.com/Ravirajm07/jal-rakshak-app/releases)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
 
 JalRakshak is a prototype civic-tech app for water-quality views, flood-risk indicators, sanitation reports, citizen alerts, and administrative complaint workflows.
 
@@ -85,7 +87,7 @@ docs/                       Release, audit and remediation documentation
 
 ## Prerequisites
 
-- Node.js 22.x recommended for parity with CI.
+- Node.js 20.9.0 or newer. Next.js 16.2.10 declares `node >=20.9.0`; CI currently uses Node.js 22.
 - npm 10.x.
 - A Firebase project for Authentication, or the Firebase Auth Emulator.
 - A MongoDB database for persistent complaint storage.
@@ -157,15 +159,17 @@ Demo access is disabled by default. Maintainers may provision temporary demo use
 
 ```bash
 npm test
+npm run test:coverage
 ```
 
-Current tests cover complaint payload validation for create and update flows.
+Current tests cover complaint payload validation, water/flood classification utilities, and CSV export escaping.
 
 ## Linting and Type Checking
 
 ```bash
 npm run lint
 npm run typecheck
+npm run check
 ```
 
 ## Production Build

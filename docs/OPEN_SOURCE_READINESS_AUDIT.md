@@ -21,6 +21,8 @@ This audit intentionally omits secret values.
 
 The working tree was clean before creating `chore/open-source-readiness-v0.1.0`.
 
+Installed Next.js version checked from package metadata: `next@16.2.10` declares `node >=20.9.0`. The README and package metadata now require Node.js 20.9.0 or newer; CI uses Node.js 22.
+
 ## Current Architecture Found In Code
 
 - Next.js App Router application under `src/app`.
@@ -104,6 +106,7 @@ Fixed in current tree:
 - Added `.gitignore` entries for env files, Firebase debug logs, private keys, and service-account JSON.
 - Added complaint create/update validation and mass-assignment rejection.
 - Added deny-by-default Firestore rules because Firestore is not active.
+- Added private disclosure instructions, scope boundaries, response goals, and no-bounty wording in `SECURITY.md`.
 
 Requires maintainer action:
 
@@ -132,6 +135,8 @@ Findings:
 
 History search found API-key-like material and demo passwords in earlier commits. This branch does not rewrite history.
 
+Final working-tree scan excluded generated/ignored folders and found no current private-key, Gemini-key, MongoDB-URL, service-account, or plaintext demo-password patterns.
+
 ## Dependency and Ownership Review
 
 - Git history currently shows contributions from `Sanskar` and `RAVIRAJ MORE`.
@@ -144,9 +149,11 @@ History search found API-key-like material and demo passwords in earlier commits
 
 Fixed in this branch:
 
-- Added Vitest.
+- Added Vitest, Testing Library, jest-dom, jsdom, user-event, and v8 coverage tooling.
 - Added complaint validation tests.
-- Added `npm test` and `npm run typecheck` scripts.
+- Added water/flood classification tests.
+- Added CSV export escaping/formatting tests.
+- Added `npm run test`, `npm run test:watch`, `npm run test:coverage`, `npm run typecheck`, and `npm run check` scripts.
 
 Still missing:
 
@@ -155,6 +162,7 @@ Still missing:
 - Firebase Authentication emulator tests.
 - Firestore rules tests; current rules deny all because Firestore is unused.
 - UI tests for auth routing, role-specific navigation, report creation, and admin update flows.
+- Additional component tests such as notification center and mobile navigation accessibility.
 - Android/Capacitor build tests.
 
 ## CI Gaps
@@ -162,14 +170,39 @@ Still missing:
 Fixed in this branch:
 
 - Added GitHub Actions workflow for `npm ci`, lint, typecheck, tests, and build.
+- Added CodeQL workflow for JavaScript/TypeScript.
+- Added dependency review workflow for pull requests.
+- Added Dependabot weekly npm and GitHub Actions update configuration.
 - Adjusted ESLint ignores so generated Android build artifacts are not linted.
 
 Still missing:
 
-- Secret scanning workflow or documented GitHub secret scanning enforcement.
-- Dependency review workflow.
+- GitHub secret scanning and push protection must be enabled in repository settings where available.
 - Firebase emulator/rules test workflow.
 - Android build workflow.
+
+## Final Verification
+
+Commands run after the readiness changes:
+
+| Command | Result |
+| --- | --- |
+| `node --version` | `v22.16.0` |
+| `npm --version` | `10.9.2` |
+| `npm view next@16.2.10 engines --json` | `{"node":">=20.9.0"}` |
+| `npm view next version engines --json` | Latest published `next` was `16.2.10`; engine was `node >=20.9.0` |
+| `curl.exe -I -L --max-time 20 https://jal-rakshak-app.vercel.app/` | Root returned `307` to `/login`; `/login` returned `200` |
+| `npm ci` | Passed; audited 674 packages; reported 2 moderate vulnerabilities |
+| `npm run lint` | Passed with 23 warnings and 0 errors |
+| `npm run typecheck` | Passed |
+| `npm run test` | Passed: 3 files, 15 tests |
+| `npm run test:coverage` | Passed: statements 84.61%, branches 77.22%, functions 100%, lines 89.33% |
+| `npm run build` | Passed; generated 17 app routes |
+| `npm audit --audit-level=moderate` | Reported 2 moderate findings in Next.js' nested PostCSS dependency; only suggested fix was `npm audit fix --force`, which would install `next@9.3.3` |
+| Secret-pattern `git grep` scan | No matches in tracked current tree |
+| Local scanner availability check | `gitleaks`, `trufflehog`, and `detect-secrets` were not installed locally |
+
+The production build emitted a missing Firebase web configuration warning when no `NEXT_PUBLIC_FIREBASE_*` values were provided. That is expected for a placeholder-only local/CI build and does not require production credentials.
 
 ## Release Blockers
 
@@ -191,9 +224,10 @@ Should be resolved before tagging v0.1.0 if maintainers require a clean security
 - Rewrote README accurately.
 - Added security, contribution, support, code-of-conduct, release, and remediation docs.
 - Added GitHub Actions CI and issue/PR templates.
+- Added CodeQL, dependency review, Dependabot, CODEOWNERS, and issue drafts.
 - Removed current tracked credential/log exposure.
 - Added `.env.example`.
-- Added complaint validation and tests.
+- Added complaint validation, water/flood status utilities, CSV export utility, and tests.
 - Added deny-by-default Firestore rules and Firebase emulator config.
 - Reduced dependency audit findings from 17 to 2 moderate findings with non-force updates.
 
