@@ -16,7 +16,7 @@ export interface Complaint {
 }
 
 // Initial Mock Data
-let STORE: Complaint[] = [
+const STORE: Complaint[] = [
     { _id: '1', type: 'Pipe Burst', location: 'Ward A, Main Sq', description: 'Major pipe burst near market', status: 'In Progress', createdAt: new Date().toISOString() },
     { _id: '2', type: 'Water Logging', location: 'Ward B, Lane 4', description: 'Stagnant water since yesterday', status: 'Open', createdAt: new Date(Date.now() - 86400000).toISOString() },
     { _id: '3', type: 'System Alert', location: 'System', description: 'Sensor malfunction in Sector 4', status: 'Open', createdAt: new Date().toISOString() },

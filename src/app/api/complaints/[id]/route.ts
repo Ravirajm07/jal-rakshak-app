@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Complaint from '@/models/Complaint';
 import { DemoStore } from '@/lib/demo-store';
+import { validateUpdateComplaint } from '@/lib/complaint-validation';
 
 export async function PATCH(
     request: Request,
@@ -12,18 +13,22 @@ export async function PATCH(
 
     try {
         body = await request.json();
-    } catch (e) {
+    } catch {
         return NextResponse.json({ success: false, error: 'Invalid JSON' }, { status: 400 });
+    }
+
+    const parsed = validateUpdateComplaint(body);
+    if (!parsed.ok) {
+        return NextResponse.json({ success: false, error: parsed.error }, { status: 400 });
     }
 
     try {
         await dbConnect();
 
-        // Try real DB first
         const complaint = await Complaint.findByIdAndUpdate(
             id,
-            { ...body },
-            { new: true }
+            { ...parsed.data },
+            { new: true, runValidators: true }
         );
 
         if (!complaint) {
@@ -31,19 +36,18 @@ export async function PATCH(
         }
 
         return NextResponse.json({ success: true, data: complaint });
-    } catch (error) {
+    } catch {
         console.warn("Database connection failed or item not found, trying DEMO store");
 
         try {
-            // Use the already parsed body
-            const updated = DemoStore.update(id, body);
+            const updated = DemoStore.update(id, parsed.data);
 
             if (updated) {
                 return NextResponse.json({ success: true, data: updated, _isDemo: true });
             } else {
                 return NextResponse.json({ success: false, error: 'Complaint not found' }, { status: 404 });
             }
-        } catch (e) {
+        } catch {
             return NextResponse.json({ success: false, error: 'Failed to update' }, { status: 400 });
         }
     }

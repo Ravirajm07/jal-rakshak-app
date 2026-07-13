@@ -2,7 +2,7 @@
 
 import styles from "./Toast.module.css";
 import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export type ToastType = "success" | "error" | "info";
 
@@ -38,7 +38,7 @@ export function Toast({ id, message, type, onClose }: ToastProps) {
     );
 }
 
-export function ToastContainer({ toasts, removeToast }: { toasts: ToastProps[], removeToast: (id: string) => void }) {
+export function ToastContainer({ toasts, removeToast }: { toasts: Omit<ToastProps, "onClose">[], removeToast: (id: string) => void }) {
     return (
         <div className={styles.container}>
             {toasts.map(t => (

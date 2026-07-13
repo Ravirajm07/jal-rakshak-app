@@ -2,50 +2,27 @@ import React, { useMemo } from 'react';
 import { useData } from '@/lib/contexts/DataContext';
 import { ShieldCheck, AlertOctagon, HelpCircle } from 'lucide-react';
 import styles from './RiskMonitor.module.css';
+import { calculateFloodRisk, classifyWaterSafety } from '@/lib/water-status';
 
 export const RiskMonitor = () => {
     const { waterData, alerts } = useData();
 
     // Scoring Logic
     const scores = useMemo(() => {
-        // 1. Flood Risk Score (0-100)
-        // Base calculation: (Level / DangerLevel) * 100
-        const DANGER_LEVEL = 45;
-        let floodScore = (waterData.level / DANGER_LEVEL) * 100;
-
-        // Modifiers
         const activeAlerts = alerts.filter(a => a.severity === 'danger').length;
-        floodScore += (activeAlerts * 10); // +10 per severe alert
-
-        // Cap at 100
-        floodScore = Math.min(Math.round(floodScore), 100);
-
-        // Determine Flood Risk Label
-        let floodLabel = 'Low';
-        let floodClass = styles.low;
-        if (floodScore > 90) { floodLabel = 'Critical'; floodClass = styles.critical; }
-        else if (floodScore > 75) { floodLabel = 'High'; floodClass = styles.high; }
-        else if (floodScore > 50) { floodLabel = 'Medium'; floodClass = styles.medium; }
-
-        // 2. Water Safety Score
-        // Simple logic: Is pH or Turbidity bad?
-        const isPhBad = waterData.ph < 6.5 || waterData.ph > 8.5;
-        const isTurbidityBad = waterData.turbidity > 5;
-
-        let safetyStatus = 'Safe';
-        let safetyClass = styles.low; // Reusing low (green) for safe
-
-        if (isPhBad && isTurbidityBad) {
-            safetyStatus = 'Critical';
-            safetyClass = styles.high;
-        } else if (isPhBad || isTurbidityBad) {
-            safetyStatus = 'Warning';
-            safetyClass = styles.medium;
-        }
+        const floodRisk = calculateFloodRisk({ level: waterData.level, activeDangerAlerts: activeAlerts });
+        const safetyStatus = classifyWaterSafety(waterData.ph, waterData.turbidity);
 
         return {
-            flood: { score: floodScore, label: floodLabel, css: floodClass },
-            safety: { status: safetyStatus, css: safetyClass }
+            flood: {
+                score: floodRisk.score,
+                label: floodRisk.label,
+                css: floodRisk.label === 'Critical' ? styles.critical : floodRisk.label === 'High' ? styles.high : floodRisk.label === 'Medium' ? styles.medium : styles.low
+            },
+            safety: {
+                status: safetyStatus,
+                css: safetyStatus === 'Critical' ? styles.high : safetyStatus === 'Warning' ? styles.medium : styles.low
+            }
         };
     }, [waterData, alerts]);
 

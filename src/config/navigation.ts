@@ -5,19 +5,19 @@ import {
     Settings,
     Info,
     BarChart,
-    FileWarning,
     User,
     Bot,
     FileText,
     Video
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export type UserRole = "citizen" | "admin" | null;
 
 export interface NavItem {
     label: string;
     href: string;
-    icon: any;
+    icon: LucideIcon;
     roles: UserRole[]; // List of roles that can see this item
 }
 

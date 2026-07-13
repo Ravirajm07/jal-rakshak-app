@@ -36,7 +36,8 @@ export function CitizenDashboard() {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        setIsMounted(true);
+        const frame = requestAnimationFrame(() => setIsMounted(true));
+        return () => cancelAnimationFrame(frame);
     }, []);
 
     // Filter complaints to only show the current user's complaints

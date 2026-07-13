@@ -1,24 +1,39 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import type { Auth } from "firebase/auth";
 
-// TODO: REPlACE WITH YOUR FIREBASE CONFIG
-// You can find this in your Firebase Console -> Project Settings -> General -> "Your apps"
 const firebaseConfig = {
-    apiKey: "AIzaSyC4d_WZb6tsPRefJgDV8zbr1Yi-6pO9gBo",
-    authDomain: "jalsakti.firebaseapp.com",
-    projectId: "jalsakti",
-    storageBucket: "jalsakti.firebasestorage.app",
-    messagingSenderId: "238884761188",
-    appId: "1:238884761188:web:13aaaf4bea5fdff1a77971",
-    measurementId: "G-K1QFT8MM67"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "",
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "",
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ?? ""
 };
 
-import { getFirestore } from "firebase/firestore";
+const missingFirebaseEnv = Object.entries(firebaseConfig)
+    .filter(([key, value]) => key !== "measurementId" && !value)
+    .map(([key]) => key);
+const hasFirebaseConfig = missingFirebaseEnv.length === 0;
 
-// Initialize Firebase (Singleton pattern)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
+if (missingFirebaseEnv.length > 0 && process.env.NODE_ENV !== "test") {
+    console.warn(
+        `Missing Firebase web configuration: ${missingFirebaseEnv.join(", ")}. Authentication will not work until these NEXT_PUBLIC_FIREBASE_* variables are set.`
+    );
+}
 
-export { auth, db };
+const app = hasFirebaseConfig ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
+const auth: Auth | null = app ? getAuth(app) : null;
+
+if (
+    auth &&
+    typeof window !== "undefined" &&
+    process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true" &&
+    !(window as Window & { __JALRAKSHAK_AUTH_EMULATOR__?: boolean }).__JALRAKSHAK_AUTH_EMULATOR__
+) {
+    connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    (window as Window & { __JALRAKSHAK_AUTH_EMULATOR__?: boolean }).__JALRAKSHAK_AUTH_EMULATOR__ = true;
+}
+
+export { auth, hasFirebaseConfig };

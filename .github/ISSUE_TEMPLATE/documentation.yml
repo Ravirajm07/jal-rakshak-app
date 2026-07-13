@@ -1,0 +1,39 @@
+name: Documentation
+description: Improve setup, architecture, security, or contribution docs
+title: "[Docs]: "
+labels: ["documentation", "good first issue", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, private citizen data, or vulnerability details. Security reports belong in SECURITY.md.
+  - type: textarea
+    id: page
+    attributes:
+      label: Document or section
+      description: Which file or section needs work?
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Suggested change
+      description: Explain what is inaccurate, missing, or confusing.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: What code, command, or file did you check?
+    validations:
+      required: true
+  - type: checkboxes
+    id: claim-check
+    attributes:
+      label: Sensitive information and claim check
+      options:
+        - label: I checked the current code before suggesting new feature or architecture wording.
+          required: true
+        - label: I removed secrets, credentials, tokens, private citizen data, and production-only values.
+          required: true

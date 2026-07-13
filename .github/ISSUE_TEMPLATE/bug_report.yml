@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a reproducible non-security problem in JalRakshak
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities here. Follow SECURITY.md for private security reporting.
+        Do not include secrets, credentials, private citizen data, production logs, or screenshots with sensitive information.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include exact local steps, route, test data, and commands.
+      placeholder: |
+        1. Run `npm run dev`
+        2. Go to `/app/report`
+        3. Submit ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Node version, npm version, OS, browser, Firebase emulator or local MongoDB details
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Sensitive information check
+      options:
+        - label: I removed secrets, credentials, tokens, private citizen data, and production-only values.
+          required: true
+        - label: This is not a vulnerability report; security issues go through SECURITY.md.
+          required: true

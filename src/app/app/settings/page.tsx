@@ -2,27 +2,14 @@
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import { useData } from "@/lib/contexts/DataContext";
-import { Moon, Bell, Globe, LogOut, Key } from "lucide-react";
-import { useState, useEffect } from "react";
-import { GeminiService } from "@/lib/services/gemini";
+import { Moon, Bell, Globe, LogOut, Bot } from "lucide-react";
+import { useState } from "react";
 import styles from "./Settings.module.css";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
     const { logout } = useData();
-    const [apiKey, setApiKey] = useState("");
-
-    useEffect(() => {
-        const savedKey = GeminiService.getApiKey();
-        if (savedKey) setApiKey(savedKey);
-    }, []);
-
-    const handleSaveKey = () => {
-        GeminiService.setApiKey(apiKey);
-        alert("API Key Saved Successfully!");
-    };
 
     const { addComplaint } = useData();
     const [isSeeding, setIsSeeding] = useState(false);
@@ -71,31 +58,19 @@ export default function SettingsPage() {
             <Card className={styles.aiCard}>
                 <div className={styles.aiHeader}>
                     <div className={styles.iconBox}>
-                        <Key size={24} />
+                        <Bot size={24} />
                     </div>
                     <div>
-                        <h3 className={styles.cardTitle}>Google Gemini AI Configuration</h3>
+                        <h3 className={styles.cardTitle}>AI Assistant Mode</h3>
                         <p className={styles.cardDesc}>
-                            Enter your API key to enable smart features like AI Chat and predictive analytics.
+                            The current assistant uses scripted prototype responses. Server-side Gemini integration is not enabled in v0.1.0.
                         </p>
                     </div>
                 </div>
 
-                <div className={styles.inputGroup}>
-                    <div className={styles.inputWrapper}>
-                        <Input
-                            type="password"
-                            placeholder="Enter your Gemini API Key here..."
-                            value={apiKey}
-                            onChange={(e) => setApiKey(e.target.value)}
-                        />
-                    </div>
-                    <Button onClick={handleSaveKey}>Save Key</Button>
-                </div>
-
                 <div className={styles.noteBox}>
                     <span className={styles.noteLabel}>Note:</span>
-                    Leave empty to use "Simulation Mode" for demonstration.
+                    Do not paste private AI API keys into the client app. Add any future AI integration behind a server-side route.
                 </div>
             </Card>
 

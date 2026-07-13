@@ -1,15 +1,20 @@
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections growing exponentially
  * during API Route usage.
  */
-let cached = (global as any).mongoose;
-
-if (!cached) {
-    cached = (global as any).mongoose = { conn: null, promise: null };
+interface MongooseCache {
+    conn: Mongoose | null;
+    promise: Promise<Mongoose> | null;
 }
+
+declare global {
+    var mongoose: MongooseCache | undefined;
+}
+
+const cached: MongooseCache = global.mongoose ?? (global.mongoose = { conn: null, promise: null });
 
 async function dbConnect() {
     const MONGODB_URI = process.env.MONGODB_URI;
