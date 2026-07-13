@@ -2,29 +2,68 @@
 
 ## Supported Versions
 
-JalRakshak is preparing an initial public `v0.1.0` prototype release. Only the current default branch and the latest tagged `0.x` release are expected to receive security fixes.
+After the initial `v0.1.0` release, security updates are planned for the `0.1.x` release line and the current default branch.
 
-## Reporting a Vulnerability
+| Version | Supported |
+| --- | --- |
+| `0.1.x` | Yes, after release |
+| Earlier versions | No |
 
-Please report suspected vulnerabilities privately to the repository maintainers using GitHub private vulnerability reporting, if enabled for the repository. If private vulnerability reporting is not enabled, contact the maintainer through a private channel before opening a public issue.
+## Responsible Disclosure
 
-Do not include secrets, exploit payloads, private user data, or production credentials in public issues, pull requests, screenshots, logs, or discussions.
+Please do not disclose vulnerabilities in public GitHub issues, pull requests, discussions, screenshots, logs, or social posts.
+
+Preferred reporting method:
+
+1. Go to the repository Security tab.
+2. Open **Report a vulnerability** / **New security advisory**.
+3. Submit the report privately through GitHub private vulnerability reporting.
+
+If private vulnerability reporting is not enabled, use a private maintainer contact path available from GitHub. Do not publish the details publicly while a fix is being prepared.
 
 ## What To Include
 
-- A short description of the issue and affected route, component, or configuration.
-- Steps to reproduce using local test data or emulators.
-- The impact and whether authentication is required.
-- Any relevant dependency advisory links.
+Please include:
 
-## Current Security Limitations
+- A concise description of the vulnerability.
+- Affected route, component, API, configuration, dependency, or workflow.
+- Reproduction steps using local test data, emulators, or a fork.
+- Impact and likely severity.
+- Whether authentication is required.
+- Any relevant logs with secrets and private citizen data removed.
+- Dependency advisory links, if applicable.
 
-- Server-side Firebase ID-token verification is not implemented for the complaint API.
-- Administrator authorization is currently derived in the client UI from account state and demo mode; it is not sufficient as a production authorization boundary.
-- Firestore rules deny all reads and writes because Firestore is not currently used by the app.
-- MongoDB-backed complaint routes require additional authentication, authorization, abuse prevention, and rate limiting before production use.
-- The AI assistant is simulation-only in `v0.1.0`; do not paste private AI API keys into client-side code or forms.
+## Response Goals
+
+These are goals, not guarantees:
+
+- Initial acknowledgement: within 7 days.
+- Triage decision: within 14 days.
+- Fix or mitigation plan for confirmed high-impact issues: within 30 days when maintainers are available.
+
+The maintainers may need more time for volunteer availability, dependency availability, or coordinated disclosure.
+
+## Scope
+
+In scope:
+
+- Source code in this repository.
+- GitHub Actions workflows and repository configuration.
+- Documentation that could cause unsafe deployment or credential exposure.
+- Dependency vulnerabilities that affect the shipped application.
+
+Out of scope:
+
+- Third-party services not controlled by this repository.
+- Denial-of-service testing against public deployments.
+- Social engineering, phishing, spam, or physical attacks.
+- Issues requiring real citizen data, production credentials, or unauthorized access.
+- Vulnerabilities in unofficial forks or modified deployments.
+
+## No Bug Bounty
+
+This project does not currently operate a bug-bounty program. Please do not expect payment, rewards, swag, or compensation for reports.
 
 ## Secret Handling
 
-Never commit `.env*` files, service-account JSON, private keys, database URLs, Firebase Admin credentials, Gemini API keys, or demo account passwords. If a secret is committed, revoke or rotate it first, then follow the remediation guidance in `docs/SECURITY_REMEDIATION.md`.
+Never commit `.env*` files, service-account JSON, private keys, database URLs, Firebase Admin credentials, Gemini API keys, or demo account passwords. If a secret is committed, revoke or rotate it first, then follow `docs/SECURITY_REMEDIATION.md`.
