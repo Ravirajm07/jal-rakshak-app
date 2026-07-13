@@ -4,6 +4,7 @@ import styles from "./Login.module.css";
 import { Button } from "@/components/ui/Button";
 import { Droplets } from "lucide-react";
 import { useState } from "react";
+import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
@@ -27,9 +28,14 @@ export default function LoginPage() {
         setError("");
 
         try {
+            if (!auth) {
+                setError("Firebase Authentication is not configured. Set NEXT_PUBLIC_FIREBASE_* values or use the Firebase Auth Emulator.");
+                return;
+            }
+
             if (isSignUp) {
                 // Sign Up Logic
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await createUserWithEmailAndPassword(auth, email, password);
                 // Set Display Name
                 if (auth.currentUser) {
                     await updateProfile(auth.currentUser, {
@@ -43,18 +49,20 @@ export default function LoginPage() {
                 await signInWithEmailAndPassword(auth, email, password);
                 router.push("/app/dashboard");
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            if (err.code === 'auth/invalid-credential') {
+            const code = err instanceof FirebaseError ? err.code : undefined;
+            const message = err instanceof Error ? err.message : "Unknown error";
+            if (code === 'auth/invalid-credential') {
                 setError("Invalid credentials. If you haven't registered yet, please switch to 'Create Account'.");
-            } else if (err.code === 'auth/email-already-in-use') {
+            } else if (code === 'auth/email-already-in-use') {
                 setError("Email is already registered. Please Sign In.");
-            } else if (err.code === 'auth/weak-password') {
+            } else if (code === 'auth/weak-password') {
                 setError("Password should be at least 6 characters.");
-            } else if (err.code === 'auth/too-many-requests') {
+            } else if (code === 'auth/too-many-requests') {
                 setError("Too many attempts. Try again later.");
             } else {
-                setError("Authentication failed. " + err.message);
+                setError("Authentication failed. " + message);
             }
         } finally {
             setLoading(false);

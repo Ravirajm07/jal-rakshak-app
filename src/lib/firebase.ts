@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
+import type { Auth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const missingFirebaseEnv = Object.entries(firebaseConfig)
     .filter(([key, value]) => key !== "measurementId" && !value)
     .map(([key]) => key);
+const hasFirebaseConfig = missingFirebaseEnv.length === 0;
 
 if (missingFirebaseEnv.length > 0 && process.env.NODE_ENV !== "test") {
     console.warn(
@@ -21,10 +23,11 @@ if (missingFirebaseEnv.length > 0 && process.env.NODE_ENV !== "test") {
     );
 }
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
+const app = hasFirebaseConfig ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
+const auth: Auth | null = app ? getAuth(app) : null;
 
 if (
+    auth &&
     typeof window !== "undefined" &&
     process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true" &&
     !(window as Window & { __JALRAKSHAK_AUTH_EMULATOR__?: boolean }).__JALRAKSHAK_AUTH_EMULATOR__
@@ -33,4 +36,4 @@ if (
     (window as Window & { __JALRAKSHAK_AUTH_EMULATOR__?: boolean }).__JALRAKSHAK_AUTH_EMULATOR__ = true;
 }
 
-export { auth };
+export { auth, hasFirebaseConfig };

@@ -15,13 +15,14 @@ import {
 } from "recharts";
 import styles from "./Analytics.module.css";
 import { Badge } from "@/components/ui/Badge";
-import { Tabs } from "@/components/ui/Tabs";
 
 // --- Advanced Logic Engines ---
 
 type TrendType = 'Rising' | 'Falling' | 'Stable' | 'Volatile';
 type RiskLevel = 'Critical' | 'High' | 'Moderate' | 'Low';
 type TimeRange = 'day' | 'week' | 'year';
+type LevelPoint = { level: number; month?: string };
+type QualityPoint = { turbidity: number };
 
 function analyzeTrend(values: number[]): TrendType {
     if (values.length < 2) return 'Stable';
@@ -53,7 +54,7 @@ function calculateVelocity(values: number[]): number {
     return parseFloat(maxRise.toFixed(2));
 }
 
-function generateInsight(range: TimeRange, levelData: any[], qualityData: any[]): string {
+function generateInsight(range: TimeRange, levelData: LevelPoint[], qualityData: QualityPoint[]): string {
     const levels = levelData.map(d => d.level);
     const turbidities = qualityData.map(d => d.turbidity);
 
@@ -86,7 +87,7 @@ function generateInsight(range: TimeRange, levelData: any[], qualityData: any[])
 
         case 'year':
             // Simple seasonality check simulation
-            const monsoonPeak = levelData.find(d => ['Jul', 'Aug'].includes(d.month))?.level || 0;
+            const monsoonPeak = levelData.find(d => typeof d.month === "string" && ['Jul', 'Aug'].includes(d.month))?.level || 0;
             const isAbnormal = monsoonPeak > 18; // Historic norm
 
             return `Strategic Insight: Annual cycle indicates ${isAbnormal ? 'heavy' : 'normal'} monsoon seasonality. Peak observed in August (${monsoonPeak}m). Infrastructure load capacity was ${isAbnormal ? 'EXCEEDED' : 'sufficient'}. Long-term recommendation: ${isAbnormal ? 'Upgrade flood defenses in Sector 4.' : 'Maintain current maintenance schedule.'}`;
@@ -166,7 +167,8 @@ export default function AnalyticsPage() {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        setIsMounted(true);
+        const frame = requestAnimationFrame(() => setIsMounted(true));
+        return () => cancelAnimationFrame(frame);
     }, []);
 
     const currentData = DATA_SETS[timeRange];

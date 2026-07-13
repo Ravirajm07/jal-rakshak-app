@@ -12,7 +12,8 @@ export function DisclaimerModal() {
         const hasSeenDisclaimer = sessionStorage.getItem("hasSeenDisclaimer");
 
         if (!hasSeenDisclaimer) {
-            setIsOpen(true);
+            const frame = requestAnimationFrame(() => setIsOpen(true));
+            return () => cancelAnimationFrame(frame);
         }
     }, []);
 

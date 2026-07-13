@@ -36,7 +36,7 @@ export async function PATCH(
         }
 
         return NextResponse.json({ success: true, data: complaint });
-    } catch (error) {
+    } catch {
         console.warn("Database connection failed or item not found, trying DEMO store");
 
         try {
@@ -47,7 +47,7 @@ export async function PATCH(
             } else {
                 return NextResponse.json({ success: false, error: 'Complaint not found' }, { status: 404 });
             }
-        } catch (e) {
+        } catch {
             return NextResponse.json({ success: false, error: 'Failed to update' }, { status: 400 });
         }
     }

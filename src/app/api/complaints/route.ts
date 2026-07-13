@@ -9,9 +9,9 @@ export async function GET() {
         await dbConnect();
         const complaints = await Complaint.find({}).sort({ createdAt: -1 });
         return NextResponse.json({ success: true, data: complaints });
-    } catch (error: any) {
-        console.warn("Database connection failed, serving DEMO data:", error.message);
-        // Fallback to shared demo store
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "unknown error";
+        console.warn("Database connection failed, serving DEMO data:", message);
         return NextResponse.json({ success: true, data: DemoStore.getAll(), _isDemo: true });
     }
 }

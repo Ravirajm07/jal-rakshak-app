@@ -1,6 +1,6 @@
 "use client";
 
-import { useData } from "@/lib/contexts/DataContext";
+import { Complaint, useData } from "@/lib/contexts/DataContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -8,7 +8,6 @@ import { useState, useRef } from "react";
 import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X, CheckCircle, Copy } from "lucide-react";
 import styles from "./Report.module.css";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 
 // Dynamic Import for Map
 const MapComponent = dynamic(() => import("@/components/map/MapComponent"), {
@@ -17,8 +16,7 @@ const MapComponent = dynamic(() => import("@/components/map/MapComponent"), {
 });
 
 export default function ReportPage() {
-    const { userRole, complaints, addComplaint, updateComplaintStatus } = useData();
-    const router = useRouter();
+    const { userRole, complaints, addComplaint } = useData();
 
     // Form State
     const [formData, setFormData] = useState({
@@ -31,17 +29,15 @@ export default function ReportPage() {
 
     // Tracking State
     const [trackId, setTrackId] = useState("");
-    const [trackingResult, setTrackingResult] = useState<any | null>(null);
+    const [trackingResult, setTrackingResult] = useState<Complaint | null>(null);
     const [showTrackModal, setShowTrackModal] = useState(false);
     const [trackError, setTrackError] = useState("");
+    const [submittedReport, setSubmittedReport] = useState<Pick<Complaint, "id" | "type" | "location" | "description" | "status" | "createdAt"> | null>(null);
 
     // ADMIN VIEW - Allow admin to file reports too (Management removed as requested)
     if (userRole === "admin") {
         return <AdminComplaintsView />;
     }
-
-    // Success State
-    const [submittedReport, setSubmittedReport] = useState<any | null>(null);
 
     // Handlers
     const handleTrackReport = () => {
@@ -72,17 +68,19 @@ export default function ReportPage() {
 
         // Generate a temporary ID for immediate display (backend will assign real one, but for demo we simulate)
         const tempId = `JR-${Math.floor(1000 + Math.random() * 9000)}`;
+        const complaintType = (formData.type || 'Other') as Complaint["type"];
 
         await addComplaint({
             ...formData,
             id: tempId, // Pass the generated ID to be stored
-            type: formData.type as any || 'Other',
+            type: complaintType,
         });
 
         // Simulate the created object for the success view
         setSubmittedReport({
             id: tempId,
             ...formData,
+            type: complaintType,
             status: 'Open',
             createdAt: new Date().toISOString()
         });
@@ -354,11 +352,11 @@ export default function ReportPage() {
 // ------ ADMIN COMPONENT ------
 function AdminComplaintsView() {
     const { complaints, updateComplaintStatus } = useData();
-    const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
-    const [responseStatus, setResponseStatus] = useState("In Progress");
+    const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+    const [responseStatus, setResponseStatus] = useState<Complaint["status"]>("In Progress");
     const [responseText, setResponseText] = useState("");
 
-    const handleOpenModal = (complaint: any) => {
+    const handleOpenModal = (complaint: Complaint) => {
         setSelectedComplaint(complaint);
         setResponseStatus(complaint.status);
         setResponseText(complaint.adminResponse || "");
@@ -371,7 +369,7 @@ function AdminComplaintsView() {
 
     const handleSubmitUpdate = () => {
         if (selectedComplaint) {
-            updateComplaintStatus(selectedComplaint.id, responseStatus as any, responseText);
+            updateComplaintStatus(selectedComplaint.id, responseStatus, responseText);
             handleCloseModal();
         }
     };
@@ -514,7 +512,7 @@ function AdminComplaintsView() {
                                 <select
                                     className={styles.select}
                                     value={responseStatus}
-                                    onChange={(e) => setResponseStatus(e.target.value)}
+                                    onChange={(e) => setResponseStatus(e.target.value as Complaint["status"])}
                                 >
                                     <option value="Open">Open</option>
                                     <option value="In Progress">In Progress</option>

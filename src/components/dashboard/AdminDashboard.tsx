@@ -38,7 +38,8 @@ export function AdminDashboard() {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        setIsMounted(true);
+        const frame = requestAnimationFrame(() => setIsMounted(true));
+        return () => cancelAnimationFrame(frame);
     }, []);
 
     const filteredComplaints = complaints;
@@ -208,7 +209,7 @@ export function AdminDashboard() {
                                         <div className={styles.reportHeader}>
                                             <div className={styles.reportType}>{report.type}</div>
                                             <div className={styles.reportTime}>
-                                                {new Date(report.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {report.createdAt ? new Date(report.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Just now"}
                                             </div>
                                         </div>
                                         <div className={styles.reportLoc}>

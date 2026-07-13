@@ -54,7 +54,7 @@ export default function AlertsPage() {
                     <div className={styles.emptyState}>
                         <Bell size={48} className="mx-auto mb-4 text-slate-300" />
                         <p>No active alerts at this time.</p>
-                        <p className="text-sm mt-1">You're all safe!</p>
+                        <p className="text-sm mt-1">No prototype alerts are active.</p>
                     </div>
                 )}
             </div>

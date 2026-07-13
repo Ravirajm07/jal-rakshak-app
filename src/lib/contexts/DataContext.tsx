@@ -8,7 +8,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase"; // Only import auth
 import { useRouter } from "next/navigation";
-import { ToastContainer } from "@/components/ui/Toast";
+import { ToastContainer, ToastProps } from "@/components/ui/Toast";
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 // Define Types
@@ -69,6 +69,16 @@ interface DataContextType {
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
+type ToastState = Omit<ToastProps, "onClose">;
+type ComplaintsApiResponse = {
+    success: boolean;
+    data?: Complaint[];
+};
+type NativeWindow = Window & {
+    Capacitor?: {
+        isNativePlatform?: () => boolean;
+    };
+};
 
 export function DataProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -110,6 +120,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
             setLoading(false); // Valid role found, stop loading immediately
         }
 
+        if (!auth) {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             if (currentUser) {
@@ -145,7 +161,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, []);
 
     // Toast State
-    const [toasts, setToasts] = useState<any[]>([]);
+    const [toasts, setToasts] = useState<ToastState[]>([]);
 
     const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
         const id = Math.random().toString(36).substr(2, 9);
@@ -170,12 +186,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
             const data = await res.json();
             if (data.success) {
-                const mappedComplaints = data.data.map((c: any) => ({
+                const apiResponse = data as ComplaintsApiResponse;
+                const mappedComplaints = (apiResponse.data ?? []).map((c) => ({
                     ...c,
                     id: c._id
                 }));
                 // Sort by latest first
-                mappedComplaints.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                mappedComplaints.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
                 setComplaints(mappedComplaints);
             }
         } catch (error) {
@@ -225,7 +242,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
-            await signOut(auth);
+            if (auth) await signOut(auth);
             router.push("/login");
         } catch (error) {
             console.error("Logout failed", error);
@@ -266,7 +283,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // Native Notification Trigger
         try {
             // Check if native environment
-            const isNative = typeof window !== 'undefined' && (window as any).Capacitor?.isNativePlatform();
+            const isNative = typeof window !== 'undefined' && (window as NativeWindow).Capacitor?.isNativePlatform?.();
             if (isNative) {
                 await LocalNotifications.schedule({
                     notifications: [
