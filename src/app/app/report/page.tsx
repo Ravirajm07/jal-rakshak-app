@@ -8,6 +8,7 @@ import { useState, useRef } from "react";
 import { CloudUpload, Search, MapPin, ArrowRight, AlertTriangle, Download, X, CheckCircle, Copy } from "lucide-react";
 import styles from "./Report.module.css";
 import dynamic from "next/dynamic";
+import { buildComplaintCsv } from "@/lib/report-export";
 
 // Dynamic Import for Map
 const MapComponent = dynamic(() => import("@/components/map/MapComponent"), {
@@ -385,24 +386,7 @@ function AdminComplaintsView() {
     const handleExport = () => {
         if (!complaints.length) return;
 
-        // Create CSV Header
-        const headers = ["ID", "Type", "Location", "Status", "Admin Response", "Description"];
-
-        // Map Data
-        const rows = complaints.map(c => [
-            c.id,
-            `"${c.type}"`, // Quote to handle commas
-            `"${c.location}"`,
-            c.status,
-            `"${c.adminResponse || ''}"`,
-            `"${c.description || ''}"`
-        ]);
-
-        // Combine
-        const csvContent = [
-            headers.join(","),
-            ...rows.map(r => r.join(","))
-        ].join("\n");
+        const csvContent = buildComplaintCsv(complaints);
 
         // Trigger Download
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
