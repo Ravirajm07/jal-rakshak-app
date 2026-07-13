@@ -12,9 +12,9 @@ export default function AboutPage() {
                     <Droplets size={48} className="text-blue-600" />
                 </div>
                 <h1 className="text-3xl font-bold text-slate-900">JalRakshak</h1>
-                <p className="text-slate-500 font-medium">Smart Water Management System</p>
+                <p className="text-slate-500 font-medium">Prototype water-quality, flood-risk and civic reporting app</p>
                 <div className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full mt-2">
-                    v1.0.0 (Beta)
+                    v0.1.0 prototype
                 </div>
             </div>
 
@@ -27,10 +27,10 @@ export default function AboutPage() {
                     <div className="space-y-2">
                         <CardTitle className="text-xl">Our Mission</CardTitle>
                         <CardDescription className="text-base leading-relaxed text-slate-600">
-                            JalRakshak empowers the citizens of Kolhapur with real-time water insights,
-                            flood alerts, and a seamless sanitation reporting mechanism. Our goal is
-                            to create a resilient, water-smart city through community participation
-                            and data-driven governance.
+                            JalRakshak explores how citizens and administrators could report water
+                            issues, review flood-risk indicators, and coordinate sanitation response.
+                            The current release uses simulated monitoring data and is not an official
+                            emergency or public-health system.
                         </CardDescription>
                     </div>
                 </div>
@@ -43,7 +43,7 @@ export default function AboutPage() {
                         <Map size={28} />
                     </div>
                     <h3 className="font-semibold text-lg mb-2">Real-time Monitoring</h3>
-                    <p className="text-sm text-slate-500">Live tracking of water levels and quality metrics across the city.</p>
+                    <p className="text-sm text-slate-500">Prototype views for water levels and quality metrics.</p>
                 </Card>
 
                 <Card className="p-6 hover:shadow-md transition-shadow">
@@ -51,7 +51,7 @@ export default function AboutPage() {
                         <Bell size={28} />
                     </div>
                     <h3 className="font-semibold text-lg mb-2">Instant Alerts</h3>
-                    <p className="text-sm text-slate-500">Immediate notifications for flood risks and critical water supply updates.</p>
+                    <p className="text-sm text-slate-500">Sample alert and notification workflows.</p>
                 </Card>
 
                 <Card className="p-6 hover:shadow-md transition-shadow">
@@ -59,7 +59,7 @@ export default function AboutPage() {
                         <Shield size={28} />
                     </div>
                     <h3 className="font-semibold text-lg mb-2">Citizen Reporting</h3>
-                    <p className="text-sm text-slate-500">Direct channel to report transparency and resolution tracking.</p>
+                    <p className="text-sm text-slate-500">Citizen issue reporting and status tracking.</p>
                 </Card>
 
                 <Card className="p-6 hover:shadow-md transition-shadow">
@@ -75,12 +75,12 @@ export default function AboutPage() {
 
             {/* Credits Section */}
             <div className="text-center space-y-4">
-                <p className="text-sm text-slate-500 uppercase tracking-widest font-semibold">Developed For</p>
+                <p className="text-sm text-slate-500 uppercase tracking-widest font-semibold">Project Scope</p>
                 <div className="flex items-center justify-center gap-2">
-                    <span className="text-xl font-bold text-slate-800">Kolhapur Municipal Corporation</span>
+                    <span className="text-xl font-bold text-slate-800">Educational civic-tech prototype</span>
                 </div>
                 <p className="text-xs text-slate-400">
-                    &copy; {new Date().getFullYear()} Smart City Initiative. All rights reserved.
+                    &copy; {new Date().getFullYear()} JalRakshak contributors.
                 </p>
             </div>
 
@@ -88,7 +88,7 @@ export default function AboutPage() {
             <div className="mt-8 flex justify-center">
                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-xs text-slate-500">
                     <Info size={14} />
-                    <span>Need support? Contact helpdesk@kolhapur.gov.in</span>
+                    <span>Report security issues through SECURITY.md.</span>
                 </div>
             </div>
         </div>

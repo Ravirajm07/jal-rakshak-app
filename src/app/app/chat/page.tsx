@@ -17,7 +17,7 @@ interface Message {
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([
-        { id: 1, text: "Hello! I am your Smart JalRakshak Assistant powered by Google Gemini. Ask me about flood risks or water safety!", sender: "bot" }
+        { id: 1, text: "Hello! I am the JalRakshak prototype assistant. I use simulated responses for flood-risk and water-safety guidance.", sender: "bot" }
     ]);
     const { userRole } = useData();
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -137,7 +137,7 @@ export default function ChatPage() {
 
             <form onSubmit={handleSend} className={styles.inputForm}>
                 <Input
-                    placeholder="Ask Gemini about flood levels..."
+                    placeholder="Ask about flood levels..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     style={{ borderRadius: '999px' }}

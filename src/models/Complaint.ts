@@ -1,10 +1,11 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { COMPLAINT_STATUSES, COMPLAINT_TYPES, ComplaintStatus, ComplaintType } from '@/lib/complaint-validation';
 
 export interface IComplaint extends Document {
-    type: string;
+    type: ComplaintType;
     location: string;
     description: string;
-    status: 'Open' | 'In Progress' | 'Resolved';
+    status: ComplaintStatus;
     userId: string;
     userEmail?: string;
     adminResponse?: string;
@@ -14,24 +15,23 @@ export interface IComplaint extends Document {
 
 const ComplaintSchema: Schema = new Schema(
     {
-        type: { type: String, required: true },
-        location: { type: String, required: true },
-        description: { type: String },
+        type: { type: String, enum: COMPLAINT_TYPES, required: true },
+        location: { type: String, required: true, trim: true, maxlength: 200 },
+        description: { type: String, required: true, trim: true, maxlength: 2000 },
         status: {
             type: String,
-            enum: ['Open', 'In Progress', 'Resolved'],
+            enum: COMPLAINT_STATUSES,
             default: 'Open'
         },
-        userId: { type: String, required: true },
-        userEmail: { type: String },
-        adminResponse: { type: String }
+        userId: { type: String, required: true, trim: true, maxlength: 128 },
+        userEmail: { type: String, trim: true, maxlength: 254 },
+        adminResponse: { type: String, trim: true, maxlength: 2000 }
     },
     {
-        timestamps: true, // Automatically manages createdAt and updatedAt
+        timestamps: true,
     }
 );
 
-// Prevent overwriting the model if it's already compiled (Hot Reload fix)
 const Complaint: Model<IComplaint> = mongoose.models.Complaint || mongoose.model<IComplaint>('Complaint', ComplaintSchema);
 
 export default Complaint;
